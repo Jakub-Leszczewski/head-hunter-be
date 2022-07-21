@@ -6,18 +6,22 @@ import {
   Patch,
   Param,
   Delete,
+  UsePipes,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
 
-@Controller('user')
+@Controller('/api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateStudentDto) {
-    return this.userService.create(createUserDto);
+  @Post('/student')
+  @UsePipes(ArrayValidationPipe(CreateStudentDto))
+  create(@Body() createUserDto: CreateStudentDto[]) {
+    console.log(createUserDto);
+    return this.userService.create(createUserDto as any);
   }
 
   @Get()

@@ -1,9 +1,9 @@
-import { IsEmail, IsNumber, Length, Max, Min } from 'class-validator';
+import { IsEmail, IsNumber, Max, MaxLength, Min } from 'class-validator';
 import { CreateStudentDtoInterface } from '../../types';
 
 export class CreateStudentDto implements CreateStudentDtoInterface {
   @IsEmail()
-  @Length(3, 255)
+  @MaxLength(256)
   public email: string;
 
   @IsNumber()
