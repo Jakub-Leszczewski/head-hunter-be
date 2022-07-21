@@ -12,16 +12,25 @@ import { UserService } from './user.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
+import { CreateStudentsResponse } from '../types';
+import { StudentService } from './student.service';
+import { HrService } from './hr.service';
 
 @Controller('/api/user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly studentService: StudentService,
+    private readonly hrService: HrService,
+  ) {}
 
   @Post('/student')
   @UsePipes(ArrayValidationPipe(CreateStudentDto))
-  create(@Body() createUserDto: CreateStudentDto[]) {
+  async create(
+    @Body() createUserDto: CreateStudentDto[],
+  ): Promise<CreateStudentsResponse> {
     console.log(createUserDto);
-    return this.userService.create(createUserDto as any);
+    return this.studentService.create(createUserDto);
   }
 
   @Get()
