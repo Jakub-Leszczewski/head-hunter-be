@@ -29,7 +29,6 @@ export class UserController {
   async create(
     @Body() createUserDto: CreateStudentDto[],
   ): Promise<CreateStudentsResponse> {
-    console.log(createUserDto);
     return this.studentService.create(createUserDto);
   }
 

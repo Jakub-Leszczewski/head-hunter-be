@@ -19,7 +19,11 @@ export class User extends BaseEntity {
   })
   public email: string;
 
-  @Column({ length: 64 })
+  @Column({
+    length: 64,
+    nullable: true,
+    default: null,
+  })
   public hashPwd: string;
 
   @Column({
@@ -38,13 +42,10 @@ export class User extends BaseEntity {
 
   @Column({
     length: 36,
+    nullable: true,
+    default: null,
   })
   public userToken: string;
-
-  @Column({
-    type: 'datetime',
-  })
-  public userTokenExpires: string;
 
   @OneToOne((type) => Student, (student) => student.user, {
     onDelete: 'CASCADE',

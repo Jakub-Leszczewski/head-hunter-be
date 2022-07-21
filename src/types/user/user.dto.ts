@@ -7,7 +7,7 @@ export interface CreateStudentDtoInterface {
   courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
-  bonusProjectUrls: number;
+  bonusProjectUrls: string[];
 }
 
 export interface UpdateStudentDtoInterface {

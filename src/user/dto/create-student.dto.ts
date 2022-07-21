@@ -1,4 +1,13 @@
-import { IsEmail, IsNumber, Max, MaxLength, Min } from 'class-validator';
+import {
+  IsEmail,
+  IsNumber,
+  IsUrl,
+  Length,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { CreateStudentDtoInterface } from '../../types';
 
 export class CreateStudentDto implements CreateStudentDtoInterface {
@@ -26,8 +35,8 @@ export class CreateStudentDto implements CreateStudentDtoInterface {
   @Max(5)
   public teamProjectDegree: number;
 
-  @IsNumber()
-  @Min(0)
-  @Max(5)
-  public bonusProjectUrls: number;
+  @IsUrl({}, { each: true })
+  @Length(1, 256, { each: true })
+  // @MinLength(1)
+  public bonusProjectUrls: string[];
 }
