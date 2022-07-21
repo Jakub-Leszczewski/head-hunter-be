@@ -2,25 +2,15 @@ import {
   BaseEntity,
   Column,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import {
-  IsBoolean,
-  IsEmail,
-  IsEnum,
-  IsMobilePhone,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUrl,
-  Length,
-  Max,
-  Min,
-  MinLength,
-} from 'class-validator';
 import { User } from './user.entity';
 import { ContractType, WorkType } from '../../types';
+import { PortfolioUrl } from './portfolio-url.entity';
+import { ProjectUrl } from './project-url.entity';
+import { BonusProjectUrl } from './bonus-project-url.entity';
 
 @Entity()
 export class Student extends BaseEntity {
@@ -56,24 +46,23 @@ export class Student extends BaseEntity {
   public teamProjectDegree: number;
 
   @Column({
-    type: 'float',
-    precision: 3,
-    scale: 2,
-  })
-  public bonusProjectUrls: number;
-
-  @Column({
     length: 60,
+    nullable: true,
+    default: null,
   })
   public lastName: string;
 
   @Column({
     length: 60,
+    nullable: true,
+    default: null,
   })
   public firstName: string;
 
   @Column({
     length: 39,
+    nullable: true,
+    default: null,
   })
   public githubUsername: string;
 
@@ -108,6 +97,7 @@ export class Student extends BaseEntity {
   @Column({
     precision: 4,
     default: 0,
+    unsigned: true,
   })
   public monthsOfCommercialExp: number;
 
@@ -156,11 +146,17 @@ export class Student extends BaseEntity {
   })
   public canTakeApprenticeship: boolean;
 
-  //@TODO stworzyć tabele one to many
-  public projectUrls: string[];
+  @OneToMany((type) => ProjectUrl, (projectUrls) => projectUrls.student)
+  public bonusProjectUrls: BonusProjectUrl[];
 
-  //@TODO stworzyć tabele one to many
-  public portfolioUrls: string[];
+  @OneToMany(
+    (type) => ProjectUrl,
+    (bonusProjectUrls) => bonusProjectUrls.student,
+  )
+  public projectUrls: ProjectUrl[];
+
+  @OneToMany((type) => PortfolioUrl, (portfolioUrls) => portfolioUrls.student)
+  public portfolioUrls: PortfolioUrl[];
 
   @OneToOne((type) => User, (user) => user.student)
   public user: User;

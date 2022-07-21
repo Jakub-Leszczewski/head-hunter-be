@@ -32,6 +32,7 @@ export class User extends BaseEntity {
     type: 'boolean',
     default: false,
     precision: 1,
+    unsigned: true,
   })
   public isActive: boolean;
 
