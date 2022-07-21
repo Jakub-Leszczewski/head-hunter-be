@@ -1,5 +1,13 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  JoinColumn,
+  BaseEntity,
+  Column,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserRole } from '../../types';
+import { Student } from './student.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -36,4 +44,10 @@ export class User extends BaseEntity {
     type: 'datetime',
   })
   public userTokenExpires: string;
+
+  @OneToOne((type) => Student, (student) => student.user, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  public student: Student;
 }

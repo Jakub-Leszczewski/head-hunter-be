@@ -1,5 +1,4 @@
-import { UpdateStudentDtoInterface, WorkType } from '../../types';
-import { ContractType } from '../../types/user/contract-type';
+import { UpdateStudentDtoInterface, WorkType, ContractType } from '../../types';
 import {
   IsBoolean,
   IsEmail,
