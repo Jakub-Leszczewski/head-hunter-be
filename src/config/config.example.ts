@@ -6,4 +6,7 @@ export const config = {
   dbPassword: 'pass',
   dbSynchronize: false,
   dbLogging: false,
+  feUrl: 'head-hunter.pl',
+  mailPassword: 'admin123',
+  mailUsername: 'admin',
 };

@@ -7,15 +7,20 @@ import { Student } from './entities/student.entity';
 import { BonusProjectUrl } from './entities/bonus-project-url.entity';
 import { User } from './entities/user.entity';
 import { v4 as uuid } from 'uuid';
+import { MailService } from '../mail/mail.service';
+import { config } from '../config/config';
 
 @Injectable()
 export class StudentService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly mailService: MailService,
+  ) {}
 
   //@TODO change types, create user entity interface
   async create(createStudentDto: CreateStudentDto[]): Promise<any> {
     const studentResponse: any = [];
-    for (const studentDto of createStudentDto) {
+    for await (const studentDto of createStudentDto) {
       const emailUniqueness = await this.userService.checkUserFieldUniqueness({
         email: studentDto.email,
       });
@@ -54,9 +59,17 @@ export class StudentService {
         await user.save();
 
         studentResponse.push(user);
+
+        await this.mailService.sendStudentSignupEmail(user.email, {
+          signupUrl: `${config.feUrl}/signup/student/${user.id}/${user.userToken}`,
+          courseCompletion: student.courseCompletion,
+          courseEngagement: student.courseEngagement,
+          projectDegree: student.projectDegree,
+          teamProjectDegree: student.teamProjectDegree,
+        });
       }
     }
-    console.log(studentResponse);
+
     return studentResponse.map((e) => this.filter(e));
   }
 
@@ -79,7 +92,6 @@ export class StudentService {
   //@TODO if will create hr table, this function must remove it
   filter(user: User) {
     const { hashPwd, userToken, student, ...userResponse } = user;
-    console.log(student);
     const { bonusProjectUrls, ...studentResponse } = student;
     const newBonusProjectUrls = bonusProjectUrls.map((e) => {
       const { student, ...bonusProjectUrl } = e;
