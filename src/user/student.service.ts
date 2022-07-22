@@ -1,10 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import {
+  ContractType,
   CreateStudentResponse,
   CreateStudentsResponse,
+  UrlInterface,
+  UrlResponse,
   UserRole,
+  WorkType,
 } from '../types';
 import { UserService } from './user.service';
 import { Student } from './entities/student.entity';
@@ -13,6 +21,10 @@ import { User } from './entities/user.entity';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../mail/mail.service';
 import { config } from '../config/config';
+import { hashPwd } from '../utils/hashPwd';
+import { ProjectUrl } from './entities/project-url.entity';
+import { PortfolioUrl } from './entities/portfolio-url.entity';
+import { SignupCompletionStudentDto } from './dto/signup-completion-student.dto';
 
 @Injectable()
 export class StudentService {
@@ -21,8 +33,7 @@ export class StudentService {
     private readonly mailService: MailService,
   ) {}
 
-  //@TODO change types, create user entity interface
-  async create(
+  async studentsImport(
     createStudentDto: CreateStudentDto[],
   ): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
@@ -40,17 +51,10 @@ export class StudentService {
         student.courseCompletion = studentDto.courseCompletion;
         await student.save();
 
-        student.bonusProjectUrls = await Promise.all(
-          studentDto.bonusProjectUrls.map(async (e) => {
-            const bonusProjectUrl = new BonusProjectUrl();
-            bonusProjectUrl.url = e;
-            await bonusProjectUrl.save();
-
-            bonusProjectUrl.student = student;
-            await bonusProjectUrl.save();
-
-            return bonusProjectUrl;
-          }),
+        student.bonusProjectUrls = await this.insertUrls(
+          studentDto.bonusProjectUrls,
+          student,
+          BonusProjectUrl,
         );
         await student.save();
 
@@ -79,22 +83,105 @@ export class StudentService {
     return studentResponse.map((e) => this.filter(e));
   }
 
-  completeSignup(number: number, updateUserDto: UpdateStudentDto) {}
+  async completeSignup(
+    userToken: string,
+    updateUserDto: SignupCompletionStudentDto,
+  ) {
+    if (!userToken) throw new BadRequestException();
+
+    await this.userService.checkUserFieldUniquenessAndThrow({
+      email: updateUserDto.email,
+    });
+
+    const user = await User.findOne({
+      where: { userToken },
+    });
+    if (!user) throw new NotFoundException();
+
+    const student = await Student.findOne({
+      where: {
+        user: { id: user.id },
+      },
+    });
+    if (!student) throw new NotFoundException();
+
+    user.firstName = updateUserDto.firstName;
+    user.lastName = updateUserDto.lastName;
+    user.email = updateUserDto.email;
+    user.hashPwd = await hashPwd(updateUserDto.password);
+    await user.save();
+
+    student.githubUsername = updateUserDto.githubUsername;
+    student.bio = updateUserDto.bio || null;
+    student.phoneNumber = updateUserDto.phoneNumber || null;
+    student.education = updateUserDto.education || null;
+    student.courses = updateUserDto.githubUsername;
+    student.monthsOfCommercialExp = updateUserDto.monthsOfCommercialExp;
+    student.workExperience = updateUserDto.workExperience || null;
+    student.targetWorkCity = updateUserDto.targetWorkCity || null;
+    student.expectedSalary = updateUserDto.expectedSalary || null;
+    student.expectedContractType =
+      updateUserDto.expectedContractType || ContractType.Irrelevant;
+    student.expectedTypeWork =
+      updateUserDto.expectedTypeWork || WorkType.Irrelevant;
+    student.canTakeApprenticeship =
+      updateUserDto.canTakeApprenticeship || false;
+    student.projectUrls = await this.insertUrls(
+      updateUserDto.projectUrls,
+      student,
+      ProjectUrl,
+    );
+    student.portfolioUrls = await this.insertUrls(
+      updateUserDto.portfolioUrls,
+      student,
+      PortfolioUrl,
+    );
+    await student.save();
+  }
+
+  async insertUrls(
+    urls: string[],
+    student: Student,
+    EntityClass: new () => ProjectUrl | PortfolioUrl | BonusProjectUrl,
+  ) {
+    return await Promise.all(
+      urls.map(async (e) => {
+        const urlEntity = new EntityClass();
+        urlEntity.url = e;
+        await urlEntity.save();
+
+        urlEntity.student = student;
+        await urlEntity.save();
+
+        return urlEntity;
+      }),
+    );
+  }
+
+  filterUrl(url: UrlInterface[]): UrlResponse[] {
+    return url.map((e) => {
+      const { student, ...urlResponse } = e;
+      return urlResponse;
+    });
+  }
 
   //@TODO if will create hr table, this function must remove it
   filter(user: User): CreateStudentResponse {
     const { hashPwd, userToken, student, ...userResponse } = user;
-    const { bonusProjectUrls, ...studentResponse } = student;
-    const newBonusProjectUrls = bonusProjectUrls.map((e) => {
-      const { student, ...bonusProjectUrl } = e;
-      return bonusProjectUrl;
-    });
+    const { bonusProjectUrls, portfolioUrls, projectUrls, ...studentResponse } =
+      student;
+
+    const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
+    const newPortfolioUrls = this.filterUrl(portfolioUrls);
+    const newProjectUrls = this.filterUrl(projectUrls);
 
     return {
       ...userResponse,
       student: {
         ...studentResponse,
         bonusProjectUrls: [...newBonusProjectUrls],
+        portfolioUrls: [...newPortfolioUrls],
+        projectUrls: [...newProjectUrls],
       },
     };
   }

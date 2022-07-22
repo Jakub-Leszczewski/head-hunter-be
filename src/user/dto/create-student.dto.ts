@@ -1,4 +1,5 @@
 import {
+  ArrayNotEmpty,
   IsEmail,
   IsNumber,
   IsUrl,
@@ -37,6 +38,6 @@ export class CreateStudentDto implements CreateStudentDtoInterface {
 
   @IsUrl({}, { each: true })
   @Length(1, 256, { each: true })
-  // @MinLength(1)
+  @ArrayNotEmpty()
   public bonusProjectUrls: string[];
 }

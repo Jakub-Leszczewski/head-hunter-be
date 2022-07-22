@@ -46,20 +46,6 @@ export class Student extends BaseEntity implements StudentInterface {
   public teamProjectDegree: number;
 
   @Column({
-    length: 60,
-    nullable: true,
-    default: null,
-  })
-  public lastName: string;
-
-  @Column({
-    length: 60,
-    nullable: true,
-    default: null,
-  })
-  public firstName: string;
-
-  @Column({
     length: 39,
     nullable: true,
     default: null,

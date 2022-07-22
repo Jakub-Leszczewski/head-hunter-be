@@ -1,5 +1,6 @@
 import { UpdateStudentDtoInterface, WorkType, ContractType } from '../../types';
 import {
+  ArrayNotEmpty,
   IsBoolean,
   IsEmail,
   IsEnum,
@@ -9,6 +10,7 @@ import {
   IsString,
   IsUrl,
   Length,
+  Matches,
   Max,
   Min,
   MinLength,
@@ -28,6 +30,11 @@ export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
   public email: string;
 
   @IsString()
+  @Length(8, 36)
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/)
+  public password: string;
+
+  @IsString()
   @Length(1, 39)
   public githubUsername: string;
 
@@ -42,13 +49,12 @@ export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
 
   @IsUrl({}, { each: true })
   @Length(1, 256, { each: true })
-  @MinLength(1)
+  @ArrayNotEmpty()
   public projectUrls: string[];
 
   @IsOptional()
   @IsUrl({}, { each: true })
   @Length(1, 256, { each: true })
-  @MinLength(0)
   public portfolioUrls: string[];
 
   @IsOptional()

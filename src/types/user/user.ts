@@ -3,6 +3,8 @@ import { StudentInterface } from './student';
 
 export interface UserInterface {
   id: string;
+  lastName: string | null;
+  firstName: string | null;
   email: string;
   hashPwd: string | null;
   role: UserRole;

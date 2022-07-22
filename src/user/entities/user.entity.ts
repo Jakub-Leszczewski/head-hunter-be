@@ -15,6 +15,20 @@ export class User extends BaseEntity implements UserInterface {
   public id: string;
 
   @Column({
+    length: 60,
+    nullable: true,
+    default: null,
+  })
+  public lastName: string;
+
+  @Column({
+    length: 60,
+    nullable: true,
+    default: null,
+  })
+  public firstName: string;
+
+  @Column({
     length: 256,
   })
   public email: string;

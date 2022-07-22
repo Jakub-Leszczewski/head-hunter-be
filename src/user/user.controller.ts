@@ -15,6 +15,7 @@ import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
 import { CreateStudentsResponse } from '../types';
 import { StudentService } from './student.service';
 import { HrService } from './hr.service';
+import { SignupCompletionStudentDto } from './dto/signup-completion-student.dto';
 
 @Controller('/api/user')
 export class UserController {
@@ -29,7 +30,7 @@ export class UserController {
   async create(
     @Body() createUserDto: CreateStudentDto[],
   ): Promise<CreateStudentsResponse> {
-    return this.studentService.create(createUserDto);
+    return this.studentService.studentsImport(createUserDto);
   }
 
   @Get()
@@ -44,10 +45,10 @@ export class UserController {
 
   @Patch('/student/:userToken')
   completeSignup(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateStudentDto,
+    @Param('userToken') userToken: string,
+    @Body() updateUserDto: SignupCompletionStudentDto,
   ) {
-    return this.studentService.completeSignup(+id, updateUserDto);
+    return this.studentService.completeSignup(userToken, updateUserDto);
   }
 
   @Patch(':id')

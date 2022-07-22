@@ -8,8 +8,6 @@ export interface StudentInterface {
   courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
-  lastName: string | null;
-  firstName: string | null;
   githubUsername: string | null;
   bio: string | null;
   phoneNumber: string | null;

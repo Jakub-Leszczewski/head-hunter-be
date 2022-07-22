@@ -1,7 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { SignupCompletionStudentDto } from './signup-completion-student.dto';
-import { ContractType } from '../../types/user/contract-type';
-import { WorkType } from '../../types';
+import { ContractType, WorkType } from '../../types';
 import {
   IsBoolean,
   IsEmail,
@@ -11,6 +10,7 @@ import {
   IsString,
   IsUrl,
   Length,
+  Matches,
   Max,
   Min,
   MinLength,
