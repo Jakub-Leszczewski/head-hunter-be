@@ -42,6 +42,14 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
+  @Patch('/student/:userToken')
+  completeSignup(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateStudentDto,
+  ) {
+    return this.studentService.completeSignup(+id, updateUserDto);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateStudentDto) {
     return this.userService.update(+id, updateUserDto);

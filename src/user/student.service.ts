@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { CreateStudentsResponse, UserRole } from '../types';
+import {
+  CreateStudentResponse,
+  CreateStudentsResponse,
+  UserRole,
+} from '../types';
 import { UserService } from './user.service';
 import { Student } from './entities/student.entity';
 import { BonusProjectUrl } from './entities/bonus-project-url.entity';
@@ -18,7 +22,9 @@ export class StudentService {
   ) {}
 
   //@TODO change types, create user entity interface
-  async create(createStudentDto: CreateStudentDto[]): Promise<any> {
+  async create(
+    createStudentDto: CreateStudentDto[],
+  ): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
     for await (const studentDto of createStudentDto) {
       const emailUniqueness = await this.userService.checkUserFieldUniqueness({
@@ -73,24 +79,10 @@ export class StudentService {
     return studentResponse.map((e) => this.filter(e));
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateStudentDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  completeSignup(number: number, updateUserDto: UpdateStudentDto) {}
 
   //@TODO if will create hr table, this function must remove it
-  filter(user: User) {
+  filter(user: User): CreateStudentResponse {
     const { hashPwd, userToken, student, ...userResponse } = user;
     const { bonusProjectUrls, ...studentResponse } = student;
     const newBonusProjectUrls = bonusProjectUrls.map((e) => {

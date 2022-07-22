@@ -7,13 +7,13 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
-import { ContractType, WorkType } from '../../types';
+import { ContractType, StudentInterface, WorkType } from '../../types';
 import { PortfolioUrl } from './portfolio-url.entity';
 import { ProjectUrl } from './project-url.entity';
 import { BonusProjectUrl } from './bonus-project-url.entity';
 
 @Entity()
-export class Student extends BaseEntity {
+export class Student extends BaseEntity implements StudentInterface {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 

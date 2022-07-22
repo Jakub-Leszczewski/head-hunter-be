@@ -7,9 +7,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Student } from './student.entity';
+import { UrlInterface } from '../../types';
 
 @Entity()
-export class ProjectUrl extends BaseEntity {
+export class ProjectUrl extends BaseEntity implements UrlInterface {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 

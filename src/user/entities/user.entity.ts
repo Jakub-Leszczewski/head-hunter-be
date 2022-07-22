@@ -6,11 +6,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserRole } from '../../types';
+import { UserInterface, UserRole } from '../../types';
 import { Student } from './student.entity';
 
 @Entity()
-export class User extends BaseEntity {
+export class User extends BaseEntity implements UserInterface {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
