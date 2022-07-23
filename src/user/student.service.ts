@@ -1,18 +1,19 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
 import {
   ContractType,
-  CreateStudentResponse,
+  UserResponse,
   CreateStudentsResponse,
   UrlInterface,
   UrlResponse,
   UserRole,
   WorkType,
+  SignupCompleteStudentsResponse,
 } from '../types';
 import { UserService } from './user.service';
 import { Student } from './entities/student.entity';
@@ -25,6 +26,7 @@ import { hashPwd } from '../utils/hashPwd';
 import { ProjectUrl } from './entities/project-url.entity';
 import { PortfolioUrl } from './entities/portfolio-url.entity';
 import { SignupCompletionStudentDto } from './dto/signup-completion-student.dto';
+import fetch from 'node-fetch';
 
 @Injectable()
 export class StudentService {
@@ -33,9 +35,7 @@ export class StudentService {
     private readonly mailService: MailService,
   ) {}
 
-  async studentsImport(
-    createStudentDto: CreateStudentDto[],
-  ): Promise<CreateStudentsResponse> {
+  async studentsImport(createStudentDto: CreateStudentDto[]): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
     for await (const studentDto of createStudentDto) {
       const emailUniqueness = await this.userService.checkUserFieldUniqueness({
@@ -49,6 +49,10 @@ export class StudentService {
         student.projectDegree = studentDto.projectDegree;
         student.teamProjectDegree = studentDto.teamProjectDegree;
         student.courseCompletion = studentDto.courseCompletion;
+        student.expectedTypeWork = WorkType.Irrelevant;
+        student.expectedContractType = ContractType.Irrelevant;
+        student.canTakeApprenticeship = false;
+        student.monthsOfCommercialExp = 0;
         await student.save();
 
         student.bonusProjectUrls = await this.insertUrls(
@@ -80,63 +84,66 @@ export class StudentService {
       }
     }
 
-    return studentResponse.map((e) => this.filter(e));
+    return studentResponse.map((e) => this.filterStudent(e));
   }
 
   async completeSignup(
     userToken: string,
-    updateUserDto: SignupCompletionStudentDto,
-  ) {
+    signupCompletionStudentDto: SignupCompletionStudentDto,
+  ): Promise<SignupCompleteStudentsResponse> {
     if (!userToken) throw new BadRequestException();
-
-    await this.userService.checkUserFieldUniquenessAndThrow({
-      email: updateUserDto.email,
-    });
 
     const user = await User.findOne({
       where: { userToken },
+      relations: ['student'],
     });
-    if (!user) throw new NotFoundException();
+    if (!user || !user.student) throw new NotFoundException();
 
-    const student = await Student.findOne({
-      where: {
-        user: { id: user.id },
-      },
-    });
-    if (!student) throw new NotFoundException();
+    if (signupCompletionStudentDto.email && signupCompletionStudentDto.email === user.email) {
+      await this.userService.checkUserFieldUniquenessAndThrow({
+        email: signupCompletionStudentDto.email,
+      });
+    }
 
-    user.firstName = updateUserDto.firstName;
-    user.lastName = updateUserDto.lastName;
-    user.email = updateUserDto.email;
-    user.hashPwd = await hashPwd(updateUserDto.password);
-    await user.save();
+    if (!(await this.checkGithubUsernameExist(signupCompletionStudentDto.githubUsername)))
+      throw new NotFoundException('Not found github account');
 
-    student.githubUsername = updateUserDto.githubUsername;
-    student.bio = updateUserDto.bio || null;
-    student.phoneNumber = updateUserDto.phoneNumber || null;
-    student.education = updateUserDto.education || null;
-    student.courses = updateUserDto.githubUsername;
-    student.monthsOfCommercialExp = updateUserDto.monthsOfCommercialExp;
-    student.workExperience = updateUserDto.workExperience || null;
-    student.targetWorkCity = updateUserDto.targetWorkCity || null;
-    student.expectedSalary = updateUserDto.expectedSalary || null;
-    student.expectedContractType =
-      updateUserDto.expectedContractType || ContractType.Irrelevant;
-    student.expectedTypeWork =
-      updateUserDto.expectedTypeWork || WorkType.Irrelevant;
-    student.canTakeApprenticeship =
-      updateUserDto.canTakeApprenticeship || false;
-    student.projectUrls = await this.insertUrls(
-      updateUserDto.projectUrls,
-      student,
+    user.firstName = signupCompletionStudentDto.firstName;
+    user.lastName = signupCompletionStudentDto.lastName;
+    user.email = signupCompletionStudentDto.email ?? user.email;
+    user.hashPwd = await hashPwd(signupCompletionStudentDto.password);
+    user.isActive = true;
+    user.userToken = null;
+
+    user.student.githubUsername = signupCompletionStudentDto.githubUsername;
+    user.student.bio = signupCompletionStudentDto.bio || null;
+    user.student.phoneNumber = signupCompletionStudentDto.phoneNumber || null;
+    user.student.education = signupCompletionStudentDto.education || null;
+    user.student.courses = signupCompletionStudentDto.courses;
+    user.student.monthsOfCommercialExp = signupCompletionStudentDto.monthsOfCommercialExp;
+    user.student.workExperience = signupCompletionStudentDto.workExperience || null;
+    user.student.targetWorkCity = signupCompletionStudentDto.targetWorkCity || null;
+    user.student.expectedSalary = signupCompletionStudentDto.expectedSalary || null;
+    user.student.expectedContractType =
+      signupCompletionStudentDto.expectedContractType || ContractType.Irrelevant;
+    user.student.expectedTypeWork =
+      signupCompletionStudentDto.expectedTypeWork || WorkType.Irrelevant;
+    user.student.canTakeApprenticeship = signupCompletionStudentDto.canTakeApprenticeship;
+    user.student.projectUrls = await this.insertUrls(
+      signupCompletionStudentDto.projectUrls,
+      user.student,
       ProjectUrl,
     );
-    student.portfolioUrls = await this.insertUrls(
-      updateUserDto.portfolioUrls,
-      student,
+    user.student.portfolioUrls = await this.insertUrls(
+      signupCompletionStudentDto.portfolioUrls,
+      user.student,
       PortfolioUrl,
     );
-    await student.save();
+
+    await user.save();
+    await user.student.save();
+
+    return this.filterStudent(user);
   }
 
   async insertUrls(
@@ -145,7 +152,7 @@ export class StudentService {
     EntityClass: new () => ProjectUrl | PortfolioUrl | BonusProjectUrl,
   ) {
     return await Promise.all(
-      urls.map(async (e) => {
+      urls?.map(async (e) => {
         const urlEntity = new EntityClass();
         urlEntity.url = e;
         await urlEntity.save();
@@ -154,22 +161,29 @@ export class StudentService {
         await urlEntity.save();
 
         return urlEntity;
-      }),
+      }) ?? [],
     );
   }
 
+  async checkGithubUsernameExist(username: string) {
+    const res = await fetch(`https://api.github.com/users/${username}`);
+
+    return res.status === 200;
+  }
+
   filterUrl(url: UrlInterface[]): UrlResponse[] {
-    return url.map((e) => {
-      const { student, ...urlResponse } = e;
-      return urlResponse;
-    });
+    return (
+      url?.map((e) => {
+        const { student, ...urlResponse } = e;
+        return urlResponse;
+      }) ?? []
+    );
   }
 
   //@TODO if will create hr table, this function must remove it
-  filter(user: User): CreateStudentResponse {
+  filterStudent(user: User): UserResponse {
     const { hashPwd, userToken, student, ...userResponse } = user;
-    const { bonusProjectUrls, portfolioUrls, projectUrls, ...studentResponse } =
-      student;
+    const { bonusProjectUrls, portfolioUrls, projectUrls, ...studentResponse } = student;
 
     const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
     const newPortfolioUrls = this.filterUrl(portfolioUrls);
@@ -179,9 +193,9 @@ export class StudentService {
       ...userResponse,
       student: {
         ...studentResponse,
-        bonusProjectUrls: [...newBonusProjectUrls],
-        portfolioUrls: [...newPortfolioUrls],
-        projectUrls: [...newProjectUrls],
+        bonusProjectUrls: newBonusProjectUrls ? [...newBonusProjectUrls] : null,
+        portfolioUrls: newPortfolioUrls ? [...newPortfolioUrls] : null,
+        projectUrls: newProjectUrls ? [...newProjectUrls] : null,
       },
     };
   }

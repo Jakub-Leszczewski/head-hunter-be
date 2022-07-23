@@ -27,6 +27,7 @@ export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
 
   @IsEmail()
   @Length(3, 255)
+  @IsOptional()
   public email: string;
 
   @IsString()

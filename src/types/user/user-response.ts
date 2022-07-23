@@ -4,7 +4,9 @@ import { StudentResponse } from './student';
 import { UrlResponse } from './url';
 
 // export type CreateStudentsResponse = CreateStudentDtoInterface[];
-export type CreateStudentResponse = Omit<UserSaveData, 'student'> & {
+export type UserResponse = Omit<UserSaveData, 'student'> & {
   student: StudentResponse;
 };
-export type CreateStudentsResponse = CreateStudentResponse[];
+
+export type CreateStudentsResponse = UserResponse[];
+export type SignupCompleteStudentsResponse = UserResponse;

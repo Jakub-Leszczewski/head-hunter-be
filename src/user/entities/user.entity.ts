@@ -1,11 +1,4 @@
-import {
-  JoinColumn,
-  BaseEntity,
-  Column,
-  Entity,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { JoinColumn, BaseEntity, Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserInterface, UserRole } from '../../types';
 import { Student } from './student.entity';
 

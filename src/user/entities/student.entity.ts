@@ -1,11 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { ContractType, StudentInterface, WorkType } from '../../types';
 import { PortfolioUrl } from './portfolio-url.entity';
@@ -135,10 +128,7 @@ export class Student extends BaseEntity implements StudentInterface {
   @OneToMany((type) => ProjectUrl, (projectUrls) => projectUrls.student)
   public bonusProjectUrls: BonusProjectUrl[];
 
-  @OneToMany(
-    (type) => ProjectUrl,
-    (bonusProjectUrls) => bonusProjectUrls.student,
-  )
+  @OneToMany((type) => ProjectUrl, (bonusProjectUrls) => bonusProjectUrls.student)
   public projectUrls: ProjectUrl[];
 
   @OneToMany((type) => PortfolioUrl, (portfolioUrls) => portfolioUrls.student)

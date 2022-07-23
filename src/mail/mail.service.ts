@@ -13,10 +13,7 @@ interface StudentSignupContext {
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendStudentSignupEmail(
-    to: string,
-    context: StudentSignupContext,
-  ): Promise<any> {
+  async sendStudentSignupEmail(to: string, context: StudentSignupContext): Promise<any> {
     await this.mailerService.sendMail({
       to,
       subject: 'MegaK Head hunter - rejestracja',

@@ -21,24 +21,17 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
-  async checkUserFieldUniquenessAndThrow(value: {
-    [key: string]: any;
-  }): Promise<void> {
-    const user = await User.findOne({
-      where: value,
-    });
-
-    const [key] = Object.keys(value);
-    if (user) throw new ConflictException(`${key} is not unique`);
-  }
-
-  async checkUserFieldUniqueness(value: {
-    [key: string]: any;
-  }): Promise<boolean> {
+  async checkUserFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
     const user = await User.findOne({
       where: value,
     });
 
     return !user;
+  }
+
+  async checkUserFieldUniquenessAndThrow(value: { [key: string]: any }) {
+    const fieldUniqueness = this.checkUserFieldUniqueness(value);
+
+    if (!fieldUniqueness) throw new ConflictException();
   }
 }
