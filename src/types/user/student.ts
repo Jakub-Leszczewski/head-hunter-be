@@ -25,7 +25,10 @@ export interface StudentInterface {
   portfolioUrls: UrlInterface[];
 }
 
-export type StudentResponse = Omit<StudentInterface, 'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls'> & {
+export type StudentResponse = Omit<
+  StudentInterface,
+  'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls'
+> & {
   bonusProjectUrls: UrlResponse[];
   projectUrls: UrlResponse[];
   portfolioUrls: UrlResponse[];

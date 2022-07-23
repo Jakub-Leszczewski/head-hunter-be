@@ -8,7 +8,11 @@ export const connectionSource = new DataSource({
   username: config.dbUsername,
   password: config.dbPassword,
   database: config.dbDatabase,
-  entities: ['dist/**/**/**.entity{.ts,.js}', 'dist/**/**.entity{.ts,.js}', 'dist/**.entity{.ts,.js}'],
+  entities: [
+    'dist/**/**/**.entity{.ts,.js}',
+    'dist/**/**.entity{.ts,.js}',
+    'dist/**.entity{.ts,.js}',
+  ],
   bigNumberStrings: false,
   logging: config.dbLogging,
   migrations: ['dist/database/migrations/*.js'],

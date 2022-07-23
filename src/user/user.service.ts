@@ -20,18 +20,4 @@ export class UserService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
-
-  async checkUserFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
-    const user = await User.findOne({
-      where: value,
-    });
-
-    return !user;
-  }
-
-  async checkUserFieldUniquenessAndThrow(value: { [key: string]: any }) {
-    const fieldUniqueness = this.checkUserFieldUniqueness(value);
-
-    if (!fieldUniqueness) throw new ConflictException();
-  }
 }

@@ -1,11 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import {
   ContractType,
-  UserResponse,
   CreateStudentsResponse,
-  UrlInterface,
-  UrlResponse,
   UserRole,
   WorkType,
   SignupCompleteStudentsResponse,
@@ -21,16 +24,17 @@ import { hashPwd } from '../utils/hashPwd';
 import { ProjectUrl } from './entities/project-url.entity';
 import { PortfolioUrl } from './entities/portfolio-url.entity';
 import { SignupCompletionStudentDto } from './dto/signup-completion-student.dto';
-import fetch from 'node-fetch';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { compare } from 'bcrypt';
 import { DataSource } from 'typeorm';
 import { isNotEmpty } from '../utils/check-object';
+import { UserHelperService } from './user-helper.service';
 
 @Injectable()
 export class StudentService {
   constructor(
     private readonly userService: UserService,
+    private readonly userHelperService: UserHelperService,
     private readonly mailService: MailService,
     private readonly dataSource: DataSource,
   ) {}
@@ -38,7 +42,7 @@ export class StudentService {
   async importStudents(createStudentDto: CreateStudentDto[]): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
     for await (const studentDto of createStudentDto) {
-      const emailUniqueness = await this.userService.checkUserFieldUniqueness({
+      const emailUniqueness = await this.userHelperService.checkUserFieldUniqueness({
         email: studentDto.email,
       });
 
@@ -84,7 +88,7 @@ export class StudentService {
       }
     }
 
-    return studentResponse.map((e) => this.filterStudent(e));
+    return studentResponse.map((e) => this.userHelperService.filterStudent(e));
   }
 
   async completeSignup(
@@ -93,33 +97,54 @@ export class StudentService {
   ): Promise<SignupCompleteStudentsResponse> {
     if (!userToken) throw new BadRequestException();
 
-    const { firstName, lastName, email, password, newPassword, projectUrls, portfolioUrls, ...studentDto } =
-      signupCompletionStudentDto;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      newPassword,
+      projectUrls,
+      portfolioUrls,
+      ...studentDto
+    } = signupCompletionStudentDto;
 
-    const userAndStudentIds = await this.dataSource
+    const userAndStudentSimpleInfo = await this.dataSource
       .createQueryBuilder()
-      .select(['user.id', 'student.id'])
+      .select(['user.id', 'user.isActive', 'student.id'])
       .from(User, 'user')
       .leftJoin('user.student', 'student')
       .where('user.userToken =:userToken', { userToken })
       .getOne();
 
-    if (!userAndStudentIds || !userAndStudentIds.student) throw new NotFoundException();
-    await Student.update({ id: userAndStudentIds.student.id }, studentDto);
+    if (!userAndStudentSimpleInfo || !userAndStudentSimpleInfo.student)
+      throw new NotFoundException();
+    if (userAndStudentSimpleInfo.isActive) throw new ForbiddenException();
+
+    if (isNotEmpty(studentDto))
+      await Student.update({ id: userAndStudentSimpleInfo.student.id }, studentDto);
 
     const user = await User.findOne({
       where: { userToken },
-      relations: ['student'],
+      relations: [
+        'student',
+        'student.bonusProjectUrls',
+        'student.portfolioUrls',
+        'student.projectUrls',
+      ],
     });
 
     if (!user || !user.student) throw new NotFoundException();
     if (signupCompletionStudentDto.email && signupCompletionStudentDto.email === user.email) {
-      await this.userService.checkUserFieldUniquenessAndThrow({
+      await this.userHelperService.checkUserFieldUniquenessAndThrow({
         email: signupCompletionStudentDto.email,
       });
     }
 
-    if (!(await this.checkGithubUsernameExist(signupCompletionStudentDto.githubUsername)))
+    if (
+      !(await this.userHelperService.checkGithubUsernameExist(
+        signupCompletionStudentDto.githubUsername,
+      ))
+    )
       throw new NotFoundException('Not found github account');
 
     user.firstName = firstName;
@@ -135,14 +160,22 @@ export class StudentService {
     await user.save();
     await user.student.save();
 
-    return this.filterStudent(user);
+    return this.userHelperService.filterStudent(user);
   }
 
   async update(id: string, updateStudentDto: UpdateStudentDto) {
     if (!id) throw new BadRequestException();
 
-    const { firstName, lastName, email, password, newPassword, projectUrls, portfolioUrls, ...studentDto } =
-      updateStudentDto;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      newPassword,
+      projectUrls,
+      portfolioUrls,
+      ...studentDto
+    } = updateStudentDto;
 
     const userAndStudentIds = await this.dataSource
       .createQueryBuilder()
@@ -154,23 +187,31 @@ export class StudentService {
 
     if (!userAndStudentIds || !userAndStudentIds.student) throw new NotFoundException();
 
-    if (isNotEmpty(studentDto)) await Student.update({ id: userAndStudentIds.student.id }, studentDto);
+    if (isNotEmpty(studentDto))
+      await Student.update({ id: userAndStudentIds.student.id }, studentDto);
 
     const user = await User.findOne({
       where: { id },
-      relations: ['student', 'student.bonusProjectUrls', 'student.portfolioUrls', 'student.projectUrls'],
+      relations: [
+        'student',
+        'student.bonusProjectUrls',
+        'student.portfolioUrls',
+        'student.projectUrls',
+      ],
     });
 
     if (!user || !user.student) throw new NotFoundException();
 
     if (updateStudentDto.email && updateStudentDto.email === user.email) {
-      await this.userService.checkUserFieldUniquenessAndThrow({ email: updateStudentDto.email });
+      await this.userHelperService.checkUserFieldUniquenessAndThrow({
+        email: updateStudentDto.email,
+      });
     }
 
     if (
       updateStudentDto.githubUsername &&
       updateStudentDto.githubUsername !== user.student.githubUsername &&
-      !(await this.checkGithubUsernameExist(updateStudentDto.githubUsername))
+      !(await this.userHelperService.checkGithubUsernameExist(updateStudentDto.githubUsername))
     )
       throw new NotFoundException('Not found github account');
 
@@ -202,7 +243,7 @@ export class StudentService {
     await user.save();
     await user.student.save();
 
-    return this.filterStudent(user);
+    return this.userHelperService.filterStudent(user);
   }
 
   async updateProjectUrls(urls: string[], student: Student) {
@@ -234,40 +275,5 @@ export class StudentService {
         return urlEntity;
       }) ?? [],
     );
-  }
-
-  async checkGithubUsernameExist(username: string) {
-    const res = await fetch(`https://api.github.com/users/${username}`);
-
-    return res.status === 200;
-  }
-
-  filterUrl(url: UrlInterface[]): UrlResponse[] {
-    return (
-      url?.map((e) => {
-        const { student, ...urlResponse } = e;
-        return urlResponse;
-      }) ?? []
-    );
-  }
-
-  //@TODO if will create hr table, this function must remove it
-  filterStudent(user: User): UserResponse {
-    const { hashPwd, userToken, student, ...userResponse } = user;
-    const { bonusProjectUrls, portfolioUrls, projectUrls, ...studentResponse } = student;
-
-    const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
-    const newPortfolioUrls = this.filterUrl(portfolioUrls);
-    const newProjectUrls = this.filterUrl(projectUrls);
-
-    return {
-      ...userResponse,
-      student: {
-        ...studentResponse,
-        bonusProjectUrls: newBonusProjectUrls ? [...newBonusProjectUrls] : null,
-        portfolioUrls: newPortfolioUrls ? [...newPortfolioUrls] : null,
-        projectUrls: newProjectUrls ? [...newProjectUrls] : null,
-      },
-    };
   }
 }

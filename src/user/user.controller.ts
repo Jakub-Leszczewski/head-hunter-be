@@ -33,7 +33,10 @@ export class UserController {
   }
 
   @Patch('/student/:userToken')
-  completeSignup(@Param('userToken') userToken: string, @Body() updateUserDto: SignupCompletionStudentDto) {
+  completeSignup(
+    @Param('userToken') userToken: string,
+    @Body() updateUserDto: SignupCompletionStudentDto,
+  ) {
     return this.studentService.completeSignup(userToken, updateUserDto);
   }
 
