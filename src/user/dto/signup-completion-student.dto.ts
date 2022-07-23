@@ -30,10 +30,14 @@ export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
   @IsOptional()
   public email: string;
 
+  @IsOptional()
+  @IsString()
+  public password: string;
+
   @IsString()
   @Length(8, 36)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/)
-  public password: string;
+  public newPassword: string;
 
   @IsString()
   @Length(1, 39)

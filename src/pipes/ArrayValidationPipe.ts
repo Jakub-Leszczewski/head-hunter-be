@@ -11,9 +11,7 @@ function createArrayValidationPipe<T>(itemType: Type<T>): Type<PipeTransform> {
         return values;
       }
 
-      return Promise.all(
-        values.map((value) => super.transform(value, { ...metadata, metatype: itemType })),
-      );
+      return Promise.all(values.map((value) => super.transform(value, { ...metadata, metatype: itemType })));
     }
   }
 

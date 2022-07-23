@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import {
   ContractType,
@@ -27,15 +22,20 @@ import { ProjectUrl } from './entities/project-url.entity';
 import { PortfolioUrl } from './entities/portfolio-url.entity';
 import { SignupCompletionStudentDto } from './dto/signup-completion-student.dto';
 import fetch from 'node-fetch';
+import { UpdateStudentDto } from './dto/update-student.dto';
+import { compare } from 'bcrypt';
+import { DataSource } from 'typeorm';
+import { isNotEmpty } from '../utils/check-object';
 
 @Injectable()
 export class StudentService {
   constructor(
     private readonly userService: UserService,
     private readonly mailService: MailService,
+    private readonly dataSource: DataSource,
   ) {}
 
-  async studentsImport(createStudentDto: CreateStudentDto[]): Promise<CreateStudentsResponse> {
+  async importStudents(createStudentDto: CreateStudentDto[]): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
     for await (const studentDto of createStudentDto) {
       const emailUniqueness = await this.userService.checkUserFieldUniqueness({
@@ -93,12 +93,26 @@ export class StudentService {
   ): Promise<SignupCompleteStudentsResponse> {
     if (!userToken) throw new BadRequestException();
 
+    const { firstName, lastName, email, password, newPassword, projectUrls, portfolioUrls, ...studentDto } =
+      signupCompletionStudentDto;
+
+    const userAndStudentIds = await this.dataSource
+      .createQueryBuilder()
+      .select(['user.id', 'student.id'])
+      .from(User, 'user')
+      .leftJoin('user.student', 'student')
+      .where('user.userToken =:userToken', { userToken })
+      .getOne();
+
+    if (!userAndStudentIds || !userAndStudentIds.student) throw new NotFoundException();
+    await Student.update({ id: userAndStudentIds.student.id }, studentDto);
+
     const user = await User.findOne({
       where: { userToken },
       relations: ['student'],
     });
-    if (!user || !user.student) throw new NotFoundException();
 
+    if (!user || !user.student) throw new NotFoundException();
     if (signupCompletionStudentDto.email && signupCompletionStudentDto.email === user.email) {
       await this.userService.checkUserFieldUniquenessAndThrow({
         email: signupCompletionStudentDto.email,
@@ -108,42 +122,99 @@ export class StudentService {
     if (!(await this.checkGithubUsernameExist(signupCompletionStudentDto.githubUsername)))
       throw new NotFoundException('Not found github account');
 
-    user.firstName = signupCompletionStudentDto.firstName;
-    user.lastName = signupCompletionStudentDto.lastName;
-    user.email = signupCompletionStudentDto.email ?? user.email;
-    user.hashPwd = await hashPwd(signupCompletionStudentDto.password);
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email ?? user.email;
+    user.hashPwd = await hashPwd(newPassword);
     user.isActive = true;
     user.userToken = null;
 
-    user.student.githubUsername = signupCompletionStudentDto.githubUsername;
-    user.student.bio = signupCompletionStudentDto.bio || null;
-    user.student.phoneNumber = signupCompletionStudentDto.phoneNumber || null;
-    user.student.education = signupCompletionStudentDto.education || null;
-    user.student.courses = signupCompletionStudentDto.courses;
-    user.student.monthsOfCommercialExp = signupCompletionStudentDto.monthsOfCommercialExp;
-    user.student.workExperience = signupCompletionStudentDto.workExperience || null;
-    user.student.targetWorkCity = signupCompletionStudentDto.targetWorkCity || null;
-    user.student.expectedSalary = signupCompletionStudentDto.expectedSalary || null;
-    user.student.expectedContractType =
-      signupCompletionStudentDto.expectedContractType || ContractType.Irrelevant;
-    user.student.expectedTypeWork =
-      signupCompletionStudentDto.expectedTypeWork || WorkType.Irrelevant;
-    user.student.canTakeApprenticeship = signupCompletionStudentDto.canTakeApprenticeship;
-    user.student.projectUrls = await this.insertUrls(
-      signupCompletionStudentDto.projectUrls,
-      user.student,
-      ProjectUrl,
-    );
-    user.student.portfolioUrls = await this.insertUrls(
-      signupCompletionStudentDto.portfolioUrls,
-      user.student,
-      PortfolioUrl,
-    );
+    user.student.projectUrls = await this.insertUrls(projectUrls, user.student, ProjectUrl);
+    user.student.portfolioUrls = await this.insertUrls(portfolioUrls, user.student, PortfolioUrl);
 
     await user.save();
     await user.student.save();
 
     return this.filterStudent(user);
+  }
+
+  async update(id: string, updateStudentDto: UpdateStudentDto) {
+    if (!id) throw new BadRequestException();
+
+    const { firstName, lastName, email, password, newPassword, projectUrls, portfolioUrls, ...studentDto } =
+      updateStudentDto;
+
+    const userAndStudentIds = await this.dataSource
+      .createQueryBuilder()
+      .select(['user.id', 'student.id'])
+      .from(User, 'user')
+      .leftJoin('user.student', 'student')
+      .where('user.id =:id', { id })
+      .getOne();
+
+    if (!userAndStudentIds || !userAndStudentIds.student) throw new NotFoundException();
+
+    if (isNotEmpty(studentDto)) await Student.update({ id: userAndStudentIds.student.id }, studentDto);
+
+    const user = await User.findOne({
+      where: { id },
+      relations: ['student', 'student.bonusProjectUrls', 'student.portfolioUrls', 'student.projectUrls'],
+    });
+
+    if (!user || !user.student) throw new NotFoundException();
+
+    if (updateStudentDto.email && updateStudentDto.email === user.email) {
+      await this.userService.checkUserFieldUniquenessAndThrow({ email: updateStudentDto.email });
+    }
+
+    if (
+      updateStudentDto.githubUsername &&
+      updateStudentDto.githubUsername !== user.student.githubUsername &&
+      !(await this.checkGithubUsernameExist(updateStudentDto.githubUsername))
+    )
+      throw new NotFoundException('Not found github account');
+
+    if (updateStudentDto.newPassword || updateStudentDto.email) {
+      if (updateStudentDto.password) {
+        const hashCompareResult = await compare(updateStudentDto.password, user.hashPwd);
+
+        if (hashCompareResult) {
+          user.hashPwd = newPassword ? await hashPwd(newPassword) : user.hashPwd;
+
+          user.email = updateStudentDto.email !== undefined ? email : user.email;
+        } else throw new UnauthorizedException();
+      } else throw new UnauthorizedException();
+    }
+
+    user.firstName = firstName ?? user.firstName;
+    user.lastName = lastName ?? user.lastName;
+
+    user.student.projectUrls =
+      updateStudentDto.projectUrls !== undefined
+        ? await this.updateProjectUrls(projectUrls, user.student)
+        : user.student.projectUrls;
+
+    user.student.portfolioUrls =
+      updateStudentDto.portfolioUrls !== undefined
+        ? await this.updatePortfolioUrls(portfolioUrls, user.student)
+        : user.student.portfolioUrls;
+
+    await user.save();
+    await user.student.save();
+
+    return this.filterStudent(user);
+  }
+
+  async updateProjectUrls(urls: string[], student: Student) {
+    await ProjectUrl.delete({ student: { id: student.id } });
+
+    return this.insertUrls(urls, student, ProjectUrl);
+  }
+
+  async updatePortfolioUrls(urls: string[], student: Student) {
+    await PortfolioUrl.delete({ student: { id: student.id } });
+
+    return this.insertUrls(urls, student, PortfolioUrl);
   }
 
   async insertUrls(

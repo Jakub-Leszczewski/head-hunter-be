@@ -125,7 +125,7 @@ export class Student extends BaseEntity implements StudentInterface {
   })
   public canTakeApprenticeship: boolean;
 
-  @OneToMany((type) => ProjectUrl, (projectUrls) => projectUrls.student)
+  @OneToMany((type) => BonusProjectUrl, (bonusProjectUrls) => bonusProjectUrls.student)
   public bonusProjectUrls: BonusProjectUrl[];
 
   @OneToMany((type) => ProjectUrl, (bonusProjectUrls) => bonusProjectUrls.student)
