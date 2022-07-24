@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { CreateStudentDtoInterface } from '../../types';
 
-export class CreateStudentDto implements CreateStudentDtoInterface {
+export class ImportStudentDto implements CreateStudentDtoInterface {
   @IsEmail()
   @MaxLength(256)
   public email: string;

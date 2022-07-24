@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Patch, Param, UsePipes } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { CreateStudentDto } from './dto/create-student.dto';
+import { ImportStudentDto } from './dto/import-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
 import { CreateStudentsResponse } from '../types';
@@ -11,8 +11,8 @@ export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
   @Post('/student')
-  @UsePipes(ArrayValidationPipe(CreateStudentDto))
-  async create(@Body() createUserDto: CreateStudentDto[]): Promise<CreateStudentsResponse> {
+  @UsePipes(ArrayValidationPipe(ImportStudentDto))
+  async create(@Body() createUserDto: ImportStudentDto[]): Promise<CreateStudentsResponse> {
     return this.studentService.importStudents(createUserDto);
   }
 

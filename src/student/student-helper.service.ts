@@ -20,10 +20,15 @@ export class StudentHelperService {
     );
   }
 
-  //@TODO if will create hr table, this function must remove it
   filterStudent(user: User): StudentResponse {
-    const { hashPwd, userToken, student, ...userResponse } = user;
-    const { bonusProjectUrls, portfolioUrls, projectUrls, ...studentResponse } = student;
+    const { hashPwd, userToken, hr, student, ...userResponse } = user;
+    const {
+      bonusProjectUrls,
+      portfolioUrls,
+      projectUrls,
+      user: userData,
+      ...studentResponse
+    } = student;
 
     const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
     const newPortfolioUrls = this.filterUrl(portfolioUrls);

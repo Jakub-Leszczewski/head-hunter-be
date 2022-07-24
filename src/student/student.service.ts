@@ -10,7 +10,8 @@ import {
   CreateStudentsResponse,
   UserRole,
   WorkType,
-  SignupCompleteStudentsResponse,
+  CompleteStudentsResponse,
+  UpdateStudentsResponse,
 } from '../types';
 import { UserService } from '../user/user.service';
 import { Student } from './entities/student.entity';
@@ -28,7 +29,7 @@ import { UserHelperService } from '../user/user-helper.service';
 import { StudentHelperService } from './student-helper.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
-import { CreateStudentDto } from './dto/create-student.dto';
+import { ImportStudentDto } from './dto/import-student.dto';
 
 @Injectable()
 export class StudentService {
@@ -39,7 +40,7 @@ export class StudentService {
     private mailService: MailService,
   ) {}
 
-  async importStudents(createStudentDto: CreateStudentDto[]): Promise<CreateStudentsResponse> {
+  async importStudents(createStudentDto: ImportStudentDto[]): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
     for await (const studentDto of createStudentDto) {
       const emailUniqueness = await this.userHelperService.checkUserFieldUniqueness({
@@ -76,8 +77,6 @@ export class StudentService {
         user.student = student;
         await user.save();
 
-        studentResponse.push(user);
-
         await this.mailService.sendStudentSignupEmail(user.email, {
           signupUrl: `${config.feUrl}/signup/student/${user.id}/${user.userToken}`,
           courseCompletion: student.courseCompletion,
@@ -85,6 +84,8 @@ export class StudentService {
           projectDegree: student.projectDegree,
           teamProjectDegree: student.teamProjectDegree,
         });
+
+        studentResponse.push(user);
       }
     }
 
@@ -94,7 +95,7 @@ export class StudentService {
   async completeSignup(
     userToken: string,
     completionStudentDto: CompletionStudentDto,
-  ): Promise<SignupCompleteStudentsResponse> {
+  ): Promise<CompleteStudentsResponse> {
     if (!userToken) throw new BadRequestException();
 
     const {
@@ -140,7 +141,7 @@ export class StudentService {
     return this.studentHelperService.filterStudent(user);
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto) {
+  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<UpdateStudentsResponse> {
     if (!id) throw new BadRequestException();
 
     const {
@@ -204,13 +205,13 @@ export class StudentService {
     return this.studentHelperService.filterStudent(user);
   }
 
-  async updateProjectUrls(urls: string[], student: Student) {
+  async updateProjectUrls(urls: string[], student: Student): Promise<ProjectUrl[]> {
     await ProjectUrl.delete({ student: { id: student.id } });
 
     return this.insertUrls(urls, student, ProjectUrl);
   }
 
-  async updatePortfolioUrls(urls: string[], student: Student) {
+  async updatePortfolioUrls(urls: string[], student: Student): Promise<PortfolioUrl[]> {
     await PortfolioUrl.delete({ student: { id: student.id } });
 
     return this.insertUrls(urls, student, PortfolioUrl);
@@ -220,7 +221,7 @@ export class StudentService {
     urls: string[],
     student: Student,
     EntityClass: new () => ProjectUrl | PortfolioUrl | BonusProjectUrl,
-  ) {
+  ): Promise<(BonusProjectUrl | ProjectUrl | PortfolioUrl)[]> {
     return await Promise.all(
       urls?.map(async (e) => {
         const urlEntity = new EntityClass();

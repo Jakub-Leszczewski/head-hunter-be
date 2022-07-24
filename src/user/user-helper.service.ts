@@ -14,7 +14,7 @@ export class UserHelperService {
   }
 
   async checkUserFieldUniquenessAndThrow(value: { [key: string]: any }) {
-    const fieldUniqueness = this.checkUserFieldUniqueness(value);
+    const fieldUniqueness = await this.checkUserFieldUniqueness(value);
 
     if (!fieldUniqueness) throw new ConflictException();
   }
