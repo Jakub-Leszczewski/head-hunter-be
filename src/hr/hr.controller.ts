@@ -3,32 +3,18 @@ import { HrService } from './hr.service';
 import { CreateHrDto } from './dto/create-hr.dto';
 import { UpdateHrDto } from './dto/update-hr.dto';
 
-@Controller('hr')
+@Controller('/api/user')
 export class HrController {
   constructor(private readonly hrService: HrService) {}
 
-  @Post()
-  create(@Body() createHrDto: CreateHrDto) {
+  @Post('/hr')
+  async create(@Body() createHrDto: CreateHrDto) {
     return this.hrService.create(createHrDto);
   }
 
-  @Get()
-  findAll() {
-    return this.hrService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.hrService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHrDto: UpdateHrDto) {
-    return this.hrService.update(+id, updateHrDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.hrService.remove(+id);
-  }
+  @Patch('/hr/:userToken')
+  async completeSignup(
+    @Param('userToken') userToken: string,
+    @Body() updateHrDto: UpdateHrDto,
+  ): Promise<any> {}
 }

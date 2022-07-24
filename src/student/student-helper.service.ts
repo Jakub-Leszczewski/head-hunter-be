@@ -5,7 +5,7 @@ import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class StudentHelperService {
-  async checkGithubUsernameExist(username: string) {
+  async checkGithubExist(username: string) {
     const res = await fetch(`https://api.github.com/users/${username}`);
 
     return res.status === 200;

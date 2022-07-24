@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, UsePipes } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { SignupCompletionStudentDto } from '../user/dto/signup-completion-student.dto';
 import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
 import { CreateStudentsResponse } from '../types';
+import { CompletionStudentDto } from './dto/completion-student.dto';
 
 @Controller('/api/user')
 export class StudentController {
@@ -19,7 +19,7 @@ export class StudentController {
   @Patch('/student/:userToken')
   completeSignup(
     @Param('userToken') userToken: string,
-    @Body() updateUserDto: SignupCompletionStudentDto,
+    @Body() updateUserDto: CompletionStudentDto,
   ) {
     return this.studentService.completeSignup(userToken, updateUserDto);
   }

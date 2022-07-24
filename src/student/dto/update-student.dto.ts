@@ -1,12 +1,16 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { SignupCompletionStudentDto } from './signup-completion-student.dto';
+import { CompletionStudentDto } from './completion-student.dto';
 import { ContractType, WorkType } from '../../types';
 import {
   ArrayNotEmpty,
   IsBoolean,
+  IsDefined,
   IsEmail,
   IsEnum,
+  IsInt,
   IsMobilePhone,
+  IsNotEmpty,
+  IsNotIn,
   IsNumber,
   IsString,
   IsUrl,
@@ -18,15 +22,15 @@ import {
 } from 'class-validator';
 import { IsNotNull } from '../../utils/validation';
 
-export class UpdateStudentDto extends PartialType(SignupCompletionStudentDto) {
+export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   @IsString()
   @Length(1, 60)
-  @ValidateIf((object, value) => value === null)
+  @IsNotNull()
   public lastName: string;
 
   @IsString()
   @Length(1, 60)
-  @ValidateIf((object, value) => value === null)
+  @IsNotNull()
   public firstName: string;
 
   @IsEmail()
@@ -51,7 +55,7 @@ export class UpdateStudentDto extends PartialType(SignupCompletionStudentDto) {
   @Length(0, 256)
   public bio: string;
 
-  @IsMobilePhone('pl-PL')
+  @IsMobilePhone()
   public phoneNumber: string;
 
   @IsUrl({}, { each: true })
@@ -69,7 +73,9 @@ export class UpdateStudentDto extends PartialType(SignupCompletionStudentDto) {
   @IsString()
   public courses: string;
 
-  @IsNumber()
+  @IsInt()
+  @Max(9999)
+  @Min(0)
   @IsNotNull()
   public monthsOfCommercialExp: number;
 

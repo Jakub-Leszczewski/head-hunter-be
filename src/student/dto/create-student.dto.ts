@@ -7,7 +7,6 @@ import {
   Max,
   MaxLength,
   Min,
-  MinLength,
 } from 'class-validator';
 import { CreateStudentDtoInterface } from '../../types';
 

@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsEmail,
   IsEnum,
+  IsInt,
   IsMobilePhone,
   IsNumber,
   IsOptional,
@@ -12,11 +13,11 @@ import {
   Length,
   Matches,
   Max,
+  MaxLength,
   Min,
-  MinLength,
 } from 'class-validator';
 
-export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
+export class CompletionStudentDto implements UpdateStudentDtoInterface {
   @IsString()
   @Length(1, 60)
   public lastName: string;
@@ -25,13 +26,14 @@ export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
   @Length(1, 60)
   public firstName: string;
 
+  @IsOptional()
   @IsEmail()
   @Length(3, 255)
-  @IsOptional()
   public email: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(36)
   public password: string;
 
   @IsString()
@@ -49,7 +51,7 @@ export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
   public bio: string;
 
   @IsOptional()
-  @IsMobilePhone('pl-PL')
+  @IsMobilePhone()
   public phoneNumber: string;
 
   @IsUrl({}, { each: true })
@@ -71,7 +73,9 @@ export class SignupCompletionStudentDto implements UpdateStudentDtoInterface {
   public courses: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsInt()
+  @Max(9999)
+  @Min(0)
   public monthsOfCommercialExp: number;
 
   @IsOptional()
