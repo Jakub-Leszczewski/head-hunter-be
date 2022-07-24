@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateHrDto } from './dto/create-hr.dto';
-import { UpdateHrDto } from './dto/update-hr.dto';
+import { CompletionHrDto } from './dto/completion-hr.dto';
 import { UserService } from '../user/user.service';
 import { UserHelperService } from '../user/user-helper.service';
 import { Hr } from './entities/hr.entity';

@@ -19,6 +19,6 @@ export class CreateHrDto {
 
   @IsInt()
   @Max(999)
-  @Min(0)
+  @Min(1)
   public maxReservedStudents: number;
 }

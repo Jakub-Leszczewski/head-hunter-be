@@ -1,15 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateHrDto } from './dto/create-hr.dto';
-import { UpdateHrDto } from './dto/update-hr.dto';
+import { CompletionHrDto } from './dto/completion-hr.dto';
 import { UserService } from '../user/user.service';
 import { UserHelperService } from '../user/user-helper.service';
 import { Hr } from './entities/hr.entity';
 import { User } from '../user/entities/user.entity';
-import { UserRole } from '../types';
+import { CompletionSignupHrResponse, CreateHrResponse, UserRole } from '../types';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../mail/mail.service';
 import { config } from '../config/config';
 import { HrHelperService } from './hr-helper.service';
+import { hashPwd } from '../utils/hashPwd';
 
 @Injectable()
 export class HrService {
@@ -20,7 +26,7 @@ export class HrService {
     private mailService: MailService,
   ) {}
 
-  async create(createHrDto: CreateHrDto) {
+  async importHr(createHrDto: CreateHrDto): Promise<CreateHrResponse> {
     await this.userHelperService.checkUserFieldUniquenessAndThrow({
       email: createHrDto.email,
     });
@@ -49,19 +55,27 @@ export class HrService {
     return this.hrHelperService.filterHr(user);
   }
 
-  findAll() {
-    return `This action returns all hr`;
+  async completeSignup(
+    userToken: string,
+    { newPassword }: CompletionHrDto,
+  ): Promise<CompletionSignupHrResponse> {
+    if (!userToken) throw new BadRequestException();
+
+    const user = await this.getHr({ userToken });
+    if (!user || !user.hr) throw new NotFoundException();
+    if (user.isActive) throw new ForbiddenException();
+
+    user.hashPwd = await hashPwd(newPassword);
+    user.isActive = true;
+    user.userToken = null;
+
+    return this.hrHelperService.filterHr(user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hr`;
-  }
-
-  update(id: number, updateHrDto: UpdateHrDto) {
-    return `This action updates a #${id} hr`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} hr`;
+  async getHr(where: { [key: string]: any }): Promise<User> {
+    return User.findOne({
+      where,
+      relations: ['hr'],
+    });
   }
 }
