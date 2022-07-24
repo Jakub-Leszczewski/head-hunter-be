@@ -68,6 +68,7 @@ export class HrService {
     user.hashPwd = await hashPwd(newPassword);
     user.isActive = true;
     user.userToken = null;
+    await user.save();
 
     return this.hrHelperService.filterHr(user);
   }
