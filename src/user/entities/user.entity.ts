@@ -1,6 +1,6 @@
 import { JoinColumn, BaseEntity, Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserInterface, UserRole } from '../../types';
-import { Student } from './student.entity';
+import { Student } from '../../student/entities/student.entity';
 
 @Entity()
 export class User extends BaseEntity implements UserInterface {

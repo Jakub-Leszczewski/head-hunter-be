@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../user/entities/user.entity';
 import { ContractType, StudentInterface, WorkType } from '../../types';
 import { PortfolioUrl } from './portfolio-url.entity';
 import { ProjectUrl } from './project-url.entity';

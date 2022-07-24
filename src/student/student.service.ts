@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateStudentDto } from './dto/create-student.dto';
+import { CreateStudentDto } from '../user/dto/create-student.dto';
 import {
   ContractType,
   CreateStudentsResponse,
@@ -13,30 +13,32 @@ import {
   WorkType,
   SignupCompleteStudentsResponse,
 } from '../types';
-import { UserService } from './user.service';
+import { UserService } from '../user/user.service';
 import { Student } from './entities/student.entity';
 import { BonusProjectUrl } from './entities/bonus-project-url.entity';
-import { User } from './entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../mail/mail.service';
 import { config } from '../config/config';
 import { hashPwd } from '../utils/hashPwd';
 import { ProjectUrl } from './entities/project-url.entity';
 import { PortfolioUrl } from './entities/portfolio-url.entity';
-import { SignupCompletionStudentDto } from './dto/signup-completion-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { SignupCompletionStudentDto } from '../user/dto/signup-completion-student.dto';
+import { UpdateStudentDto } from '../user/dto/update-student.dto';
 import { compare } from 'bcrypt';
 import { DataSource } from 'typeorm';
 import { isNotEmpty } from '../utils/check-object';
-import { UserHelperService } from './user-helper.service';
+import { UserHelperService } from '../user/user-helper.service';
+import { StudentHelperService } from './student-helper.service';
 
 @Injectable()
 export class StudentService {
   constructor(
-    private readonly userService: UserService,
-    private readonly userHelperService: UserHelperService,
-    private readonly mailService: MailService,
-    private readonly dataSource: DataSource,
+    private userService: UserService,
+    private userHelperService: UserHelperService,
+    private studentHelperService: StudentHelperService,
+    private mailService: MailService,
+    private dataSource: DataSource,
   ) {}
 
   async importStudents(createStudentDto: CreateStudentDto[]): Promise<CreateStudentsResponse> {
@@ -88,7 +90,7 @@ export class StudentService {
       }
     }
 
-    return studentResponse.map((e) => this.userHelperService.filterStudent(e));
+    return studentResponse.map((e) => this.studentHelperService.filterStudent(e));
   }
 
   async completeSignup(
@@ -141,7 +143,7 @@ export class StudentService {
     }
 
     if (
-      !(await this.userHelperService.checkGithubUsernameExist(
+      !(await this.studentHelperService.checkGithubUsernameExist(
         signupCompletionStudentDto.githubUsername,
       ))
     )
@@ -160,7 +162,7 @@ export class StudentService {
     await user.save();
     await user.student.save();
 
-    return this.userHelperService.filterStudent(user);
+    return this.studentHelperService.filterStudent(user);
   }
 
   async update(id: string, updateStudentDto: UpdateStudentDto) {
@@ -211,7 +213,7 @@ export class StudentService {
     if (
       updateStudentDto.githubUsername &&
       updateStudentDto.githubUsername !== user.student.githubUsername &&
-      !(await this.userHelperService.checkGithubUsernameExist(updateStudentDto.githubUsername))
+      !(await this.studentHelperService.checkGithubUsernameExist(updateStudentDto.githubUsername))
     )
       throw new NotFoundException('Not found github account');
 
@@ -243,7 +245,7 @@ export class StudentService {
     await user.save();
     await user.student.save();
 
-    return this.userHelperService.filterStudent(user);
+    return this.studentHelperService.filterStudent(user);
   }
 
   async updateProjectUrls(urls: string[], student: Student) {

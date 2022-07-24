@@ -1,5 +1,5 @@
 import { ContractType } from './contract-type';
-import { WorkType } from './work-type';
+import { WorkType } from '../user/work-type';
 import { UrlInterface, UrlResponse } from './url';
 
 export interface StudentInterface {

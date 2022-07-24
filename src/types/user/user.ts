@@ -1,5 +1,5 @@
 import { UserRole } from './user-role';
-import { StudentInterface } from './student';
+import { StudentInterface } from '../student/student';
 
 export interface UserInterface {
   id: string;
