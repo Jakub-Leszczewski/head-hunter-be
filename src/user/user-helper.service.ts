@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { UrlInterface, UrlResponse, UserResponse } from '../types';
+import { UrlInterface, UrlResponseData, StudentResponse } from '../types';
 import fetch from 'node-fetch';
 
 @Injectable()

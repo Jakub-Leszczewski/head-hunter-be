@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UrlInterface, UrlResponse, UserResponse } from '../types';
+import { UrlInterface, UrlResponseData, StudentResponse } from '../types';
 import fetch from 'node-fetch';
 import { User } from '../user/entities/user.entity';
 
@@ -11,7 +11,7 @@ export class StudentHelperService {
     return res.status === 200;
   }
 
-  filterUrl(url: UrlInterface[]): UrlResponse[] {
+  filterUrl(url: UrlInterface[]): UrlResponseData[] {
     return (
       url?.map((e) => {
         const { student, ...urlResponse } = e;
@@ -21,7 +21,7 @@ export class StudentHelperService {
   }
 
   //@TODO if will create hr table, this function must remove it
-  filterStudent(user: User): UserResponse {
+  filterStudent(user: User): StudentResponse {
     const { hashPwd, userToken, student, ...userResponse } = user;
     const { bonusProjectUrls, portfolioUrls, projectUrls, ...studentResponse } = student;
 

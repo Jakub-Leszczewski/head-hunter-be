@@ -13,4 +13,4 @@ export interface UserInterface {
   student?: StudentInterface | null;
 }
 
-export type UserSaveData = Omit<UserInterface, 'hashPwd' | 'userToken'>;
+export type UserResponseData = Omit<UserInterface, 'hashPwd' | 'userToken'>;
