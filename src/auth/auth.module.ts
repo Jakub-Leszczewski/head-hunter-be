@@ -10,6 +10,7 @@ import { StudentHelperService } from '../student/student-helper.service';
 import { HrHelperService } from '../hr/hr-helper.service';
 import { StudentModule } from '../student/student.module';
 import { HrModule } from '../hr/hr.module';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { HrModule } from '../hr/hr.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [LocalStrategy, AuthService],
+  providers: [LocalStrategy, AuthService, JwtStrategy],
   exports: [],
 })
 export class AuthModule {}

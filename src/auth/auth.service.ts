@@ -6,7 +6,7 @@ import { config } from '../config/config';
 import { v4 as uuid } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { UserHelperService } from '../user/user-helper.service';
-import { LoginResponse } from '../types';
+import { LoginResponse, LogoutResponse } from '../types';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +44,21 @@ export class AuthService {
     });
 
     return this.userHelperService.filterOnlyUser(user);
+  }
+
+  async logout(user: User, res: Response): Promise<LogoutResponse> {
+    if (!user?.jwtId) return { ok: false };
+
+    user.jwtId = null;
+    await user.save();
+
+    res.clearCookie('access_token', {
+      secure: false,
+      httpOnly: true,
+      maxAge: config.jwtCookieTimeToExpire,
+    });
+
+    return { ok: true };
   }
 
   async generateNewJwtId(): Promise<string> {
