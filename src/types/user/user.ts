@@ -1,5 +1,6 @@
 import { UserRole } from './user-role';
-import { StudentInterface } from '../student/student';
+import { StudentInterface } from '../student';
+import { HrInterface } from '../hr';
 
 export interface UserInterface {
   id: string;
@@ -10,7 +11,13 @@ export interface UserInterface {
   role: UserRole;
   isActive: boolean;
   userToken: string | null;
+  jwtId: string | null;
   student?: StudentInterface | null;
+  hr?: HrInterface | null;
 }
 
-export type UserResponseData = Omit<UserInterface, 'hashPwd' | 'userToken'>;
+export type UserResponseData = Omit<UserInterface, 'hashPwd' | 'userToken' | 'jwtId'>;
+export type OnlyUserResponseData = Omit<
+  UserInterface,
+  'hashPwd' | 'userToken' | 'jwtId' | 'student' | 'hr'
+>;

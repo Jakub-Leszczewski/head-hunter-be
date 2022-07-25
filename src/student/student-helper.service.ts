@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { UrlInterface, UrlResponseData, StudentResponse } from '../types';
 import fetch from 'node-fetch';
 import { User } from '../user/entities/user.entity';
+import { UserHelperService } from '../user/user-helper.service';
 
 @Injectable()
 export class StudentHelperService {
+  constructor(private userHelperService: UserHelperService) {}
+
   async checkGithubExist(username: string) {
     const res = await fetch(`https://api.github.com/users/${username}`);
 
@@ -20,15 +23,9 @@ export class StudentHelperService {
     );
   }
 
-  filterStudent(user: User): StudentResponse {
-    const { hashPwd, userToken, hr, student, ...userResponse } = user;
-    const {
-      bonusProjectUrls,
-      portfolioUrls,
-      projectUrls,
-      user: userData,
-      ...studentResponse
-    } = student;
+  filterStudent(userEntity: User): StudentResponse {
+    const { hr, student, ...userResponse } = this.userHelperService.filter(userEntity);
+    const { bonusProjectUrls, portfolioUrls, projectUrls, user, ...studentResponse } = student;
 
     const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
     const newPortfolioUrls = this.filterUrl(portfolioUrls);

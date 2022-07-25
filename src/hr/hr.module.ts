@@ -9,5 +9,6 @@ import { HrHelperService } from './hr-helper.service';
   imports: [UserModule, MailModule],
   controllers: [HrController],
   providers: [HrService, HrHelperService],
+  exports: [HrService, HrHelperService],
 })
 export class HrModule {}
