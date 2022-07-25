@@ -13,6 +13,10 @@ interface HrSignupContext {
   signupUrl: string;
 }
 
+interface ForgotPasswordContext {
+  forgotPasswordUrl: string;
+}
+
 @Injectable()
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
@@ -31,6 +35,15 @@ export class MailService {
       to,
       subject: 'MegaK Head hunter - rejestracja',
       template: 'hr-signup',
+      context,
+    });
+  }
+
+  async sendForgotPassword(to: string, context: ForgotPasswordContext): Promise<any> {
+    await this.mailerService.sendMail({
+      to,
+      subject: 'MegaK Head hunter - reset hasła',
+      template: 'forgot-password',
       context,
     });
   }

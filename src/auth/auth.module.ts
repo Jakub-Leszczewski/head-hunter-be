@@ -6,14 +6,12 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { config } from '../config/config';
 import { UserModule } from '../user/user.module';
-import { StudentHelperService } from '../student/student-helper.service';
-import { HrHelperService } from '../hr/hr-helper.service';
-import { StudentModule } from '../student/student.module';
-import { HrModule } from '../hr/hr.module';
 import { JwtStrategy } from './jwt.strategy';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
+    MailModule,
     PassportModule,
     UserModule,
     JwtModule.register({

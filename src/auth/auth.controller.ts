@@ -1,11 +1,12 @@
-import { Controller, Delete, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserObj } from '../decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginResponse } from '../types';
+import { ForgotPasswordResponse, LoginResponse, LogoutResponse } from '../types';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -20,7 +21,15 @@ export class AuthController {
 
   @Delete('/logout')
   @UseGuards(JwtAuthGuard)
-  logout(@Res({ passthrough: true }) res: Response, @UserObj() user: User) {
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+    @UserObj() user: User,
+  ): Promise<LogoutResponse> {
     return this.authService.logout(user, res);
+  }
+
+  @Delete('/password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<ForgotPasswordResponse> {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
