@@ -55,6 +55,9 @@ export class User extends BaseEntity implements UserInterface {
   })
   public userToken: string;
 
+  @Column()
+  public jwtId: string;
+
   @OneToOne((type) => Student, (student) => student.user, {
     onDelete: 'CASCADE',
   })

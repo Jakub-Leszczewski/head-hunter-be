@@ -1,10 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes } from '@nestjs/common';
+import { Controller, Get, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import { StudentService } from '../student/student.service';
 
 @Controller('/api/user')
 export class UserController {
-  constructor(private userService: UserService, private studentService: StudentService) {}
+  constructor(private userService: UserService) {}
 
   @Get()
   findAll() {

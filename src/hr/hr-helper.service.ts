@@ -12,9 +12,11 @@ import { config } from '../config/config';
 
 @Injectable()
 export class HrHelperService {
-  filterHr(user: User): HrResponse {
-    const { hashPwd, userToken, hr, student, ...userResponse } = user;
-    const { user: userData, ...hrResponse } = hr;
+  constructor(private userHelperService: UserHelperService) {}
+
+  filterHr(userEntity: User): HrResponse {
+    const { hr, student, ...userResponse } = this.userHelperService.filter(userEntity);
+    const { user, ...hrResponse } = hr;
 
     return {
       ...userResponse,
