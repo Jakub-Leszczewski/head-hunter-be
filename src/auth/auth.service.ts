@@ -11,9 +11,16 @@ import { config } from '../config/config';
 import { v4 as uuid } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { UserHelperService } from '../user/user-helper.service';
-import { ForgotPasswordResponse, LoginResponse, LogoutResponse } from '../types';
+import {
+  ResetPasswordResponse,
+  LoginResponse,
+  LogoutResponse,
+  SetNewPasswordResponse,
+} from '../types';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailService } from '../mail/mail.service';
+import { SetNewPasswordDto } from './dto/set-new-password.dto';
+import { hashPwd } from '../utils/hashPwd';
 
 @Injectable()
 export class AuthService {
@@ -69,7 +76,7 @@ export class AuthService {
     return { ok: true };
   }
 
-  async resetPassword({ email }: ResetPasswordDto): Promise<ForgotPasswordResponse> {
+  async resetPassword({ email }: ResetPasswordDto): Promise<ResetPasswordResponse> {
     if (!email) throw new BadRequestException();
 
     const user = await User.findOne({ where: { email } });
@@ -98,5 +105,22 @@ export class AuthService {
     } while (!isUniqueness);
 
     return newJwtId;
+  }
+
+  async setNewPassword(
+    userToken: string,
+    { newPassword }: SetNewPasswordDto,
+  ): Promise<SetNewPasswordResponse> {
+    if (!userToken) throw new BadRequestException();
+
+    const user = await User.findOne({ where: { userToken } });
+    if (!user) throw new NotFoundException();
+    if (!user.isActive) throw new ForbiddenException();
+
+    user.hashPwd = await hashPwd(newPassword);
+    user.userToken = null;
+    await user.save();
+
+    return { ok: true };
   }
 }

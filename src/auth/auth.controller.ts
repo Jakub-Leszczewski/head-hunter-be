@@ -1,12 +1,29 @@
-import { Body, Controller, Delete, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserObj } from '../decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { ForgotPasswordResponse, LoginResponse, LogoutResponse } from '../types';
+import {
+  ResetPasswordResponse,
+  LoginResponse,
+  LogoutResponse,
+  SetNewPasswordResponse,
+} from '../types';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SetNewPasswordDto } from './dto/set-new-password.dto';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -29,7 +46,15 @@ export class AuthController {
   }
 
   @Delete('/password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<ForgotPasswordResponse> {
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<ResetPasswordResponse> {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Put('/password/:userToken')
+  async setNewPassword(
+    @Body() resetPasswordDto: SetNewPasswordDto,
+    @Param('userToken') userToken: string,
+  ): Promise<SetNewPasswordResponse> {
+    return this.authService.setNewPassword(userToken, resetPasswordDto);
   }
 }
