@@ -1,5 +1,5 @@
 import { UserRole } from './user-role';
-import { StudentInterface } from './student';
+import { StudentInterface } from '../student/student';
 
 export interface UserInterface {
   id: string;
@@ -13,4 +13,4 @@ export interface UserInterface {
   student?: StudentInterface | null;
 }
 
-export type UserSaveData = Omit<UserInterface, 'hashPwd' | 'userToken'>;
+export type UserResponseData = Omit<UserInterface, 'hashPwd' | 'userToken'>;

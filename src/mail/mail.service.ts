@@ -9,6 +9,10 @@ interface StudentSignupContext {
   signupUrl: string;
 }
 
+interface HrSignupContext {
+  signupUrl: string;
+}
+
 @Injectable()
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
@@ -18,6 +22,15 @@ export class MailService {
       to,
       subject: 'MegaK Head hunter - rejestracja',
       template: 'student-signup',
+      context,
+    });
+  }
+
+  async sendHrSignupEmail(to: string, context: HrSignupContext): Promise<any> {
+    await this.mailerService.sendMail({
+      to,
+      subject: 'MegaK Head hunter - rejestracja',
+      template: 'hr-signup',
       context,
     });
   }

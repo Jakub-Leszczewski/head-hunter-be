@@ -6,4 +6,4 @@ export interface UrlInterface {
   student: StudentInterface;
 }
 
-export type UrlResponse = Omit<UrlInterface, 'student'>;
+export type UrlResponseData = Omit<UrlInterface, 'student'>;

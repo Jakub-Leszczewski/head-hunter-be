@@ -1,5 +1,5 @@
 import { WorkType } from './work-type';
-import { ContractType } from './contract-type';
+import { ContractType } from '../student/contract-type';
 
 export interface CreateStudentDtoInterface {
   email: string;

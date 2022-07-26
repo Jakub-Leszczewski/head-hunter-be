@@ -1,6 +1,6 @@
 import { ContractType } from './contract-type';
-import { WorkType } from './work-type';
-import { UrlInterface, UrlResponse } from './url';
+import { WorkType } from '../user/work-type';
+import { UrlInterface, UrlResponseData } from './url';
 
 export interface StudentInterface {
   id: string;
@@ -25,11 +25,11 @@ export interface StudentInterface {
   portfolioUrls: UrlInterface[];
 }
 
-export type StudentResponse = Omit<
+export type StudentResponseData = Omit<
   StudentInterface,
   'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls'
 > & {
-  bonusProjectUrls: UrlResponse[];
-  projectUrls: UrlResponse[];
-  portfolioUrls: UrlResponse[];
+  bonusProjectUrls: UrlResponseData[];
+  projectUrls: UrlResponseData[];
+  portfolioUrls: UrlResponseData[];
 };

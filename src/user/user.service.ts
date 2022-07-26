@@ -1,7 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-import { CreateStudentDto } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
-import { User } from './entities/user.entity';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
@@ -13,7 +10,7 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateStudentDto) {
+  update(id: number, updateUserDto: any) {
     return `This action updates a #${id} user`;
   }
 
