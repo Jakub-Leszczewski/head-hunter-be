@@ -6,7 +6,7 @@ import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
 import { CreateStudentsResponse } from '../types';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { SetRole } from '../decorators/set-role';
-import { UserOwnerGuard } from '../guards/user-owner.guard';
+import { UserOwnerOrRoleGuard } from '../guards/user-owner-or-role.guard';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('/api/user')
@@ -28,8 +28,8 @@ export class StudentController {
   }
 
   @Patch(':id/student')
-  @SetRole('admin', 'user')
-  @UseGuards(JwtAuthGuard, UserOwnerGuard)
+  @SetRole('admin')
+  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(id, updateStudentDto);
   }
