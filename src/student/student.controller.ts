@@ -1,10 +1,13 @@
-import { Controller, Post, Body, Patch, Param, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, UsePipes, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
 import { CreateStudentsResponse } from '../types';
 import { CompletionStudentDto } from './dto/completion-student.dto';
+import { SetRole } from '../decorators/set-role';
+import { UserOwnerGuard } from '../guards/user-owner.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('/api/user')
 export class StudentController {
@@ -25,6 +28,8 @@ export class StudentController {
   }
 
   @Patch(':id/student')
+  @SetRole('admin', 'user')
+  @UseGuards(JwtAuthGuard, UserOwnerGuard)
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(id, updateStudentDto);
   }
