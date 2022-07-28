@@ -17,6 +17,6 @@ export class UserOwnerOrRoleGuard implements CanActivate {
     if (!ownerId) throw new BadRequestException();
     if (!user) throw new Error('User is undefined');
 
-    return user.id === ownerId || roles.includes(user.role);
+    return user.id === ownerId || roles?.includes(user.role);
   }
 }

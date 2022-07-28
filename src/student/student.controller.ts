@@ -8,18 +8,22 @@ import { CompletionStudentDto } from './dto/completion-student.dto';
 import { SetRole } from '../decorators/set-role';
 import { UserOwnerOrRoleGuard } from '../guards/user-owner-or-role.guard';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RoleGuard } from '../guards/role.guard';
 
 @Controller('/api/user')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
   @Post('/student')
+  @SetRole('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @UsePipes(ArrayValidationPipe(ImportStudentDto))
   async create(@Body() createUserDto: ImportStudentDto[]): Promise<CreateStudentsResponse> {
     return this.studentService.importStudents(createUserDto);
   }
 
   @Patch('/student/:userToken')
+  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
   completeSignup(
     @Param('userToken') userToken: string,
     @Body() updateUserDto: CompletionStudentDto,
