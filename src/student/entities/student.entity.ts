@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { ContractType, StudentInterface, WorkType } from '../../types';
+import { ContractType, StudentInterface, StudentStatus, WorkType } from '../../types';
 import { PortfolioUrl } from './portfolio-url.entity';
 import { ProjectUrl } from './project-url.entity';
 import { BonusProjectUrl } from './bonus-project-url.entity';
@@ -9,6 +9,13 @@ import { BonusProjectUrl } from './bonus-project-url.entity';
 export class Student extends BaseEntity implements StudentInterface {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
+
+  @Column({
+    type: 'enum',
+    enum: StudentStatus,
+    default: StudentStatus.Available,
+  })
+  public status: StudentStatus;
 
   @Column({
     type: 'float',
