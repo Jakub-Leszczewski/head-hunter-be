@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UrlInterface, UrlResponseData, StudentResponse } from '../types';
 import fetch from 'node-fetch';
 import { User } from '../user/entities/user.entity';
@@ -6,7 +6,9 @@ import { UserHelperService } from '../user/user-helper.service';
 
 @Injectable()
 export class StudentHelperService {
-  constructor(private userHelperService: UserHelperService) {}
+  constructor(
+    @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
+  ) {}
 
   async checkGithubExist(username: string) {
     const res = await fetch(`https://api.github.com/users/${username}`);

@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
+import { FindUserResponse } from '../types/user/user-response';
 
 @Controller('/api/user')
 export class UserController {
@@ -11,12 +12,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<FindUserResponse> {
     return this.userService.findOne(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
   }
 }
