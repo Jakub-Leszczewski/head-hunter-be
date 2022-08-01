@@ -40,6 +40,22 @@ export class StudentService {
     private mailService: MailService,
   ) {}
 
+  async findOne(id: string) {
+    if (!id) throw new BadRequestException();
+
+    const user = await User.findOne({
+      where: {
+        id,
+        role: UserRole.Student,
+      },
+      relations: ['student'],
+    });
+
+    if (!user) throw new NotFoundException();
+
+    return this.studentHelperService.filterStudent(user);
+  }
+
   async importStudents(createStudentDto: ImportStudentDto[]): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
     for await (const studentDto of createStudentDto) {

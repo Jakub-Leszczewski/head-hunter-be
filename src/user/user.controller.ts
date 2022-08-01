@@ -16,7 +16,7 @@ export class UserController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
-  @SetRole('admin', 'hr')
+  @SetRole('admin')
   async findOne(@Param('id') id: string): Promise<FindUserResponse> {
     return this.userService.findOne(id);
   }
