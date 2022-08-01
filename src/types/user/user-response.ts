@@ -1,3 +1,3 @@
 import { UserResponseAllData } from './user';
 
-export type FindUserResponse = UserResponseAllData;
+export type GetUserResponse = UserResponseAllData;

@@ -18,9 +18,9 @@ import {
   SetNewPasswordResponse,
 } from '../types';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../common/providers/mail/mail.service';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
-import { hashPwd } from '../utils/hashPwd';
+import { hashPwd } from '../common/utils/hashPwd';
 
 @Injectable()
 export class AuthService {

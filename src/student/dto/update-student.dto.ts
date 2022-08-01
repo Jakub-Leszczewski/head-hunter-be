@@ -20,7 +20,7 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
-import { IsNotNull } from '../../utils/validation';
+import { IsNotNull } from '../../common/utils/validation';
 
 export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   @IsString()

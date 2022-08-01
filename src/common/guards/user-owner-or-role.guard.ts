@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { User } from '../user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class UserOwnerOrRoleGuard implements CanActivate {

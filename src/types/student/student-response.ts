@@ -5,6 +5,8 @@ export type StudentResponse = Omit<UserResponseData, 'student' | 'hr'> & {
   student: StudentResponseData;
 };
 
+export type GetStudentResponse = StudentResponse;
+export type GetStudentsResponse = StudentResponse[];
 export type CreateStudentsResponse = StudentResponse[];
 export type CompleteStudentsResponse = StudentResponse;
 export type UpdateStudentsResponse = StudentResponse;

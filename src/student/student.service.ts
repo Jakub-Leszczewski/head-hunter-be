@@ -12,19 +12,21 @@ import {
   WorkType,
   CompleteStudentsResponse,
   UpdateStudentsResponse,
+  GetStudentResponse,
+  GetStudentsResponse,
 } from '../types';
 import { UserService } from '../user/user.service';
 import { Student } from './entities/student.entity';
 import { BonusProjectUrl } from './entities/bonus-project-url.entity';
 import { User } from '../user/entities/user.entity';
 import { v4 as uuid } from 'uuid';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
-import { hashPwd } from '../utils/hashPwd';
+import { hashPwd } from '../common/utils/hashPwd';
 import { ProjectUrl } from './entities/project-url.entity';
 import { PortfolioUrl } from './entities/portfolio-url.entity';
 import { compare } from 'bcrypt';
-import { isNotEmpty } from '../utils/check-object';
+import { isNotEmpty } from '../common/utils/check-object';
 import { UserHelperService } from '../user/user-helper.service';
 import { StudentHelperService } from './student-helper.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -40,7 +42,11 @@ export class StudentService {
     private mailService: MailService,
   ) {}
 
-  async findOne(id: string) {
+  async findAll(): Promise<GetStudentsResponse> {
+    return undefined;
+  }
+
+  async findOne(id: string): Promise<GetStudentResponse> {
     if (!id) throw new BadRequestException();
 
     const user = await User.findOne({

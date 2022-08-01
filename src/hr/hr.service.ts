@@ -12,10 +12,10 @@ import { Hr } from './entities/hr.entity';
 import { User } from '../user/entities/user.entity';
 import { CompletionSignupHrResponse, CreateHrResponse, UserRole } from '../types';
 import { v4 as uuid } from 'uuid';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
 import { HrHelperService } from './hr-helper.service';
-import { hashPwd } from '../utils/hashPwd';
+import { hashPwd } from '../common/utils/hashPwd';
 
 @Injectable()
 export class HrService {

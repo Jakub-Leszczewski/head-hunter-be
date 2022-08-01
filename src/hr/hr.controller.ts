@@ -2,10 +2,10 @@ import { Controller, Post, Body, Patch, Param, UseGuards } from '@nestjs/common'
 import { HrService } from './hr.service';
 import { CreateHrDto } from './dto/create-hr.dto';
 import { CompletionHrDto } from './dto/completion-hr.dto';
-import { SetRole } from '../decorators/set-role';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { RoleGuard } from '../guards/role.guard';
-import { UserOwnerOrRoleGuard } from '../guards/user-owner-or-role.guard';
+import { SetRole } from '../common/decorators/set-role';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RoleGuard } from '../common/guards/role.guard';
+import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard';
 
 @Controller('/api/user')
 export class HrController {

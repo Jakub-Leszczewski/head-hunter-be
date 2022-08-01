@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { MailModule } from '../mail/mail.module';
+import { MailModule } from '../common/providers/mail/mail.module';
 import { UserHelperService } from './user-helper.service';
 import { StudentModule } from '../student/student.module';
 import { HrModule } from '../hr/hr.module';
