@@ -20,19 +20,30 @@ import {
   LoginResponse,
   LogoutResponse,
   SetNewPasswordResponse,
+  GetAuthUserResponse,
 } from '../types';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
+import { UserHelperService } from '../user/user-helper.service';
 
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private userHelperService: UserHelperService) {}
+
+  @Get('/user')
+  @UseGuards(JwtAuthGuard)
+  async getAuthUser(@UserObj() user: User): Promise<GetAuthUserResponse> {
+    return this.userHelperService.filterUserByRole(user);
+  }
 
   @Post('/login')
   @UseGuards(AuthGuard('local'))
   @HttpCode(200)
-  login(@Res({ passthrough: true }) res: Response, @UserObj() user: User): Promise<LoginResponse> {
+  async login(
+    @Res({ passthrough: true }) res: Response,
+    @UserObj() user: User,
+  ): Promise<LoginResponse> {
     return this.authService.login(user, res);
   }
 
