@@ -1,20 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { User } from './entities/user.entity';
+import { UserHelperService } from './user-helper.service';
+import { FindUserResponse } from '../types/user/user-response';
 
 @Injectable()
 export class UserService {
+  constructor(private userHelperService: UserHelperService) {}
+
   findAll() {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  async findOne(id: string): Promise<FindUserResponse> {
+    if (!id) throw new BadRequestException();
 
-  update(id: number, updateUserDto: any) {
-    return `This action updates a #${id} user`;
-  }
+    const user = await User.findOne({
+      where: { id },
+      relations: ['student', 'hr'],
+    });
+    if (!user) throw new NotFoundException();
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.userHelperService.filterUserByRole(user);
   }
 }

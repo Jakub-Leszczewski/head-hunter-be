@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Param, UsePipes, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, UsePipes, UseGuards, Get } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -9,10 +9,18 @@ import { SetRole } from '../decorators/set-role';
 import { UserOwnerOrRoleGuard } from '../guards/user-owner-or-role.guard';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RoleGuard } from '../guards/role.guard';
+import { FindUserResponse } from '../types/user/user-response';
 
 @Controller('/api/user')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
+
+  @Get('/:id/student')
+  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
+  @SetRole('admin', 'hr')
+  async findOne(@Param('id') id: string): Promise<FindUserResponse> {
+    return this.studentService.findOne(id);
+  }
 
   @Post('/student')
   @SetRole('admin')
@@ -31,7 +39,7 @@ export class StudentController {
     return this.studentService.completeSignup(userToken, updateUserDto);
   }
 
-  @Patch(':id/student')
+  @Patch('/:id/student')
   @SetRole('admin')
   @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {

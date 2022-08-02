@@ -2,9 +2,11 @@ import { ContractType } from './contract-type';
 import { WorkType } from '../user/work-type';
 import { UrlInterface, UrlResponseData } from './url';
 import { UserInterface } from '../user';
+import { StudentStatus } from './student-status';
 
 export interface StudentInterface {
   id: string;
+  status: StudentStatus;
   courseCompletion: number;
   courseEngagement: number;
   projectDegree: number;
