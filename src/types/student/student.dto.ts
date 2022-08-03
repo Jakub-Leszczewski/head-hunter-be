@@ -1,5 +1,8 @@
-import { WorkType } from './work-type';
-import { ContractType } from '../student/contract-type';
+import { WorkType } from '../user';
+import { ContractType } from './contract-type';
+import { SortBy } from './sort-by';
+import { SortMethod } from '../sort-method';
+import { StudentStatus } from './student-status';
 
 export interface CreateStudentDtoInterface {
   email: string;
@@ -28,4 +31,20 @@ export interface UpdateStudentDtoInterface {
   expectedContractType: ContractType;
   expectedTypeWork: WorkType;
   canTakeApprenticeship: boolean;
+}
+
+export interface FindAllQueryDtoInterface {
+  sortBy: SortBy;
+  sortMethod: SortMethod;
+  search: string;
+  courseCompletion: number;
+  courseEngagement: number;
+  projectDegree: number;
+  teamProjectDegree: number;
+  contractType: ContractType[];
+  typeWork: WorkType[];
+  salaryMin: number;
+  salaryMax: number;
+  canTakeApprenticeship: boolean | boolean[];
+  monthsOfCommercialExp: number;
 }

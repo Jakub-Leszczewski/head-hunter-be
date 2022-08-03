@@ -1,10 +1,9 @@
 import { Controller, Get, Param, UseGuards, Patch, Body } from '@nestjs/common';
 import { UserService } from './user.service';
-import { GetUserResponse } from '../types/user/user-response';
+import { GetUserResponse, GetStudentResponse } from '../types';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard';
 import { SetRole } from '../common/decorators/set-role';
-import { GetStudentResponse } from '../types';
 import { UpdateStudentDto } from '../student/dto/update-student.dto';
 import { StudentService } from '../student/student.service';
 

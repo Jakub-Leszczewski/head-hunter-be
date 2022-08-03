@@ -42,7 +42,7 @@ export class StudentService {
     private mailService: MailService,
   ) {}
 
-  async findAll(): Promise<GetStudentsResponse> {
+  async findAll(query): Promise<GetStudentsResponse> {
     return undefined;
   }
 

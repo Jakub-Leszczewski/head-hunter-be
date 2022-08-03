@@ -12,23 +12,25 @@ import {
 import { StudentService } from './student.service';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { ArrayValidationPipe } from '../common/pipes/ArrayValidationPipe';
-import { CreateStudentsResponse, GetStudentsResponse } from '../types';
+import { CreateStudentsResponse, GetStudentsResponse, SortBy } from '../types';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { SetRole } from '../common/decorators/set-role';
 import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
+import { FindAllQueryDto } from './dto/find-all-query.dto';
+import { ItemToArray } from '../common/pipes/item-to-array';
 
 @Controller('/api/student')
 export class StudentController {
   constructor(private studentService: StudentService) {}
 
   @Get('/')
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @SetRole('admin', 'hr')
-  async findAll(): Promise<GetStudentsResponse> {
-    console.log('wow');
-    return this.studentService.findAll();
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @SetRole('admin', 'hr')
+  async findAll(@Query() query: FindAllQueryDto): Promise<GetStudentsResponse> {
+    console.log(query);
+    return this.studentService.findAll(query);
   }
 
   @Post('/')
