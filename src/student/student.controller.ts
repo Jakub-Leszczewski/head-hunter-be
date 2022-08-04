@@ -19,7 +19,6 @@ import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard'
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
-import { ItemToArray } from '../common/pipes/item-to-array';
 
 @Controller('/api/student')
 export class StudentController {
@@ -29,7 +28,6 @@ export class StudentController {
   // @UseGuards(JwtAuthGuard, RoleGuard)
   // @SetRole('admin', 'hr')
   async findAll(@Query() query: FindAllQueryDto): Promise<GetStudentsResponse> {
-    console.log(query);
     return this.studentService.findAll(query);
   }
 

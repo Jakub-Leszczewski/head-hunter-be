@@ -43,6 +43,7 @@ export class StudentService {
   ) {}
 
   async findAll(query): Promise<GetStudentsResponse> {
+    console.log(query);
     return undefined;
   }
 

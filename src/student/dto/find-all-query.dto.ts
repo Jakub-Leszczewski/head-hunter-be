@@ -9,7 +9,7 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
 
   @IsEnum(SortMethod)
   @IsOptional()
-  public sortMethod: SortMethod = SortMethod.Asc;
+  public sortMethod: SortMethod = SortMethod.Desc;
 
   @IsString()
   @Length(0, 255)
@@ -40,7 +40,7 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @IsOptional()
   public teamProjectDegree: number = 0;
 
-  @IsEnumArray(SortBy)
+  @IsEnumArray(ContractType)
   @IsOptional()
   public contractType: ContractType[] = [
     ContractType.Irrelevant,
@@ -49,7 +49,7 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
     ContractType.PossibleMandate,
   ];
 
-  @IsEnumArray(SortBy)
+  @IsEnumArray(WorkType)
   @IsOptional()
   public typeWork: WorkType[] = [
     WorkType.Irrelevant,
