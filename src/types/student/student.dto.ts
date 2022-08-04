@@ -34,6 +34,7 @@ export interface UpdateStudentDtoInterface {
 }
 
 export interface FindAllQueryDtoInterface {
+  page: number;
   sortBy: SortBy;
   sortMethod: SortMethod;
   search: string;

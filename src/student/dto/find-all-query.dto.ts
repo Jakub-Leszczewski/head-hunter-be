@@ -3,6 +3,11 @@ import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, Max, Min } from 
 import { IsBooleanArray, IsEnumArray } from '../../common/decorators/validation';
 
 export class FindAllQueryDto implements FindAllQueryDtoInterface {
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  public page: number = 1;
+
   @IsEnum(SortBy)
   @IsOptional()
   public sortBy: SortBy;
