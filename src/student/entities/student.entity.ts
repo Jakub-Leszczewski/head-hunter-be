@@ -106,8 +106,7 @@ export class Student extends BaseEntity implements StudentInterface {
     type: 'float',
     precision: 9,
     scale: 2,
-    nullable: true,
-    default: null,
+    default: 0,
   })
   public expectedSalary: number;
 

@@ -48,7 +48,6 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @IsEnumArray(ContractType)
   @IsOptional()
   public contractType: ContractType[] = [
-    ContractType.Irrelevant,
     ContractType.EmploymentContract,
     ContractType.PossibleB2BContract,
     ContractType.PossibleMandate,
@@ -57,7 +56,6 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @IsEnumArray(WorkType)
   @IsOptional()
   public typeWork: WorkType[] = [
-    WorkType.Irrelevant,
     WorkType.Hybrid,
     WorkType.OnSite,
     WorkType.ReadyToMoving,
@@ -80,9 +78,9 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @Min(0)
   @Max(9999)
   @IsOptional()
-  public monthsOfCommercialExp: number = 1;
+  public monthsOfCommercialExp: number = 0;
 
   @IsBooleanArray()
   @IsOptional()
-  public canTakeApprenticeship: boolean[] | boolean = [true, false];
+  public canTakeApprenticeship: boolean[] = [true, false];
 }

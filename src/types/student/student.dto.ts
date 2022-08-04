@@ -46,6 +46,6 @@ export interface FindAllQueryDtoInterface {
   typeWork: WorkType[];
   salaryMin: number;
   salaryMax: number;
-  canTakeApprenticeship: boolean | boolean[];
+  canTakeApprenticeship: boolean[];
   monthsOfCommercialExp: number;
 }

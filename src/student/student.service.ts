@@ -14,6 +14,7 @@ import {
   UpdateStudentsResponse,
   GetStudentResponse,
   GetStudentsResponse,
+  SortBy,
 } from '../types';
 import { UserService } from '../user/user.service';
 import { Student } from './entities/student.entity';
@@ -32,6 +33,8 @@ import { StudentHelperService } from './student-helper.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
+import { DataSource } from 'typeorm';
+import { FindAllQueryDto } from './dto/find-all-query.dto';
 
 @Injectable()
 export class StudentService {
@@ -40,11 +43,54 @@ export class StudentService {
     private userHelperService: UserHelperService,
     private studentHelperService: StudentHelperService,
     private mailService: MailService,
+    private dataSource: DataSource,
   ) {}
 
-  async findAll(query): Promise<GetStudentsResponse> {
+  async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {
+    const {
+      sortBy,
+      sortMethod,
+      courseCompletion,
+      courseEngagement,
+      projectDegree,
+      teamProjectDegree,
+      salaryMin,
+      salaryMax,
+      monthsOfCommercialExp,
+      contractType,
+      typeWork,
+      canTakeApprenticeship,
+    } = query;
+
     console.log(query);
-    return undefined;
+
+    const user = await this.dataSource
+      .createQueryBuilder()
+      .select(['user', 'student'])
+      .from(User, 'user')
+      .leftJoin('user.student', 'student')
+      .where('user.role=:role', { role: UserRole.Student })
+      .andWhere('student.courseCompletion >= :courseCompletion', { courseCompletion })
+      .andWhere('student.courseEngagement >= :courseEngagement', { courseEngagement })
+      .andWhere('student.projectDegree >= :projectDegree', { projectDegree })
+      .andWhere('student.teamProjectDegree >= :teamProjectDegree', { teamProjectDegree })
+      .andWhere('student.expectedSalary >= :salaryMin', { salaryMin })
+      .andWhere('student.expectedSalary <= :salaryMax', { salaryMax })
+      .andWhere('student.monthsOfCommercialExp >= :monthsOfCommercialExp', {
+        monthsOfCommercialExp,
+      })
+      .andWhere('student.expectedContractType IN (:...contractType)', {
+        contractType: [...contractType, ContractType.Irrelevant],
+      })
+      .andWhere('student.expectedTypeWork IN (:...typeWork)', {
+        typeWork: [...typeWork, WorkType.Irrelevant],
+      })
+      .andWhere('student.canTakeApprenticeship IN (:...canTakeApprenticeship)', {
+        canTakeApprenticeship: [...canTakeApprenticeship],
+      })
+      .orderBy(sortBy ? `student.${sortBy}` : 'user.id', sortMethod)
+      .getMany();
+    return user;
   }
 
   async findOne(id: string): Promise<GetStudentResponse> {
@@ -79,8 +125,6 @@ export class StudentService {
         student.courseCompletion = studentDto.courseCompletion;
         student.expectedTypeWork = WorkType.Irrelevant;
         student.expectedContractType = ContractType.Irrelevant;
-        student.canTakeApprenticeship = false;
-        student.monthsOfCommercialExp = 0;
         await student.save();
 
         student.bonusProjectUrls = await this.insertUrls(
@@ -121,16 +165,8 @@ export class StudentService {
   ): Promise<CompleteStudentsResponse> {
     if (!userToken) throw new BadRequestException();
 
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      newPassword,
-      projectUrls,
-      portfolioUrls,
-      ...studentDto
-    } = completionStudentDto;
+    const { firstName, lastName, email, newPassword, projectUrls, portfolioUrls, ...studentDto } =
+      completionStudentDto;
 
     const user = await this.getStudent({ userToken });
     if (!user || !user.student) throw new NotFoundException();
