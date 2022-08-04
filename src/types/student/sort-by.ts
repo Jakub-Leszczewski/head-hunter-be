@@ -4,8 +4,8 @@ export enum SortBy {
   ProjectDegree = 'projectDegree',
   TeamProjectDegree = 'teamProjectDegree',
   ExpectedTypeWork = 'expectedTypeWork',
-  ExpectedContractType = 'ExpectedContractType',
-  ExpectedSalary = 'ExpectedSalary',
-  CanTakeApprenticeship = 'CanTakeApprenticeship',
-  MonthOfCommercialExperience = 'MonthOfCommercialExperience',
+  ExpectedContractType = 'expectedContractType',
+  ExpectedSalary = 'expectedSalary',
+  CanTakeApprenticeship = 'canTakeApprenticeship',
+  MonthOfCommercialExperience = 'monthOfCommercialExperience',
 }

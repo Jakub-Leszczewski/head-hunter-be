@@ -1,6 +1,6 @@
 import { ContractType, FindAllQueryDtoInterface, SortBy, SortMethod, WorkType } from '../../types';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, Max, Min } from 'class-validator';
-import { BooleanArray } from '../../common/utils/validation';
+import { IsBooleanArray, IsEnumArray } from '../../common/decorators/validation';
 
 export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @IsEnum(SortBy)
@@ -40,7 +40,7 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @IsOptional()
   public teamProjectDegree: number = 0;
 
-  @IsEnum(ContractType, { each: true })
+  @IsEnumArray(SortBy)
   @IsOptional()
   public contractType: ContractType[] = [
     ContractType.Irrelevant,
@@ -49,7 +49,7 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
     ContractType.PossibleMandate,
   ];
 
-  @IsEnum(WorkType, { each: true })
+  @IsEnumArray(SortBy)
   @IsOptional()
   public typeWork: WorkType[] = [
     WorkType.Irrelevant,
@@ -77,7 +77,7 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @IsOptional()
   public monthsOfCommercialExp: number = 1;
 
-  @BooleanArray()
+  @IsBooleanArray()
   @IsOptional()
   public canTakeApprenticeship: boolean[] | boolean = [true, false];
 }
