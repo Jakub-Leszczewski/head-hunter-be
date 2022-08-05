@@ -33,7 +33,7 @@ import { StudentHelperService } from './student-helper.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
-import { DataSource } from 'typeorm';
+import { Between, DataSource, In, LessThan, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 
 @Injectable()
@@ -64,32 +64,25 @@ export class StudentService {
 
     console.log(query);
 
-    const user = await this.dataSource
-      .createQueryBuilder()
-      .select(['user', 'student'])
-      .from(User, 'user')
-      .leftJoin('user.student', 'student')
-      .where('user.role=:role', { role: UserRole.Student })
-      .andWhere('student.courseCompletion >= :courseCompletion', { courseCompletion })
-      .andWhere('student.courseEngagement >= :courseEngagement', { courseEngagement })
-      .andWhere('student.projectDegree >= :projectDegree', { projectDegree })
-      .andWhere('student.teamProjectDegree >= :teamProjectDegree', { teamProjectDegree })
-      .andWhere('student.expectedSalary >= :salaryMin', { salaryMin })
-      .andWhere('student.expectedSalary <= :salaryMax', { salaryMax })
-      .andWhere('student.monthsOfCommercialExp >= :monthsOfCommercialExp', {
-        monthsOfCommercialExp,
-      })
-      .andWhere('student.expectedContractType IN (:...contractType)', {
-        contractType: [...contractType, ContractType.Irrelevant],
-      })
-      .andWhere('student.expectedTypeWork IN (:...typeWork)', {
-        typeWork: [...typeWork, WorkType.Irrelevant],
-      })
-      .andWhere('student.canTakeApprenticeship IN (:...canTakeApprenticeship)', {
-        canTakeApprenticeship: [...canTakeApprenticeship],
-      })
-      .orderBy(sortBy ? `student.${sortBy}` : 'user.id', sortMethod)
-      .getMany();
+    const user = await User.find({
+      relations: ['student'],
+      where: {
+        role: UserRole.Student,
+        student: {
+          courseCompletion: MoreThanOrEqual(courseCompletion),
+          courseEngagement: MoreThanOrEqual(courseEngagement),
+          projectDegree: MoreThanOrEqual(projectDegree),
+          teamProjectDegree: MoreThanOrEqual(teamProjectDegree),
+          monthsOfCommercialExp: MoreThanOrEqual(monthsOfCommercialExp),
+          expectedSalary: Between(salaryMin, salaryMax),
+          expectedContractType: In([...contractType, ContractType.Irrelevant]),
+          expectedTypeWork: In([...typeWork, ContractType.Irrelevant]),
+          canTakeApprenticeship: In([...canTakeApprenticeship]),
+        },
+      },
+      order: { student: { [sortBy ?? 'id']: sortMethod } },
+    });
+
     return user;
   }
 
