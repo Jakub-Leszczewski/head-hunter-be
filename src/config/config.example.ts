@@ -9,4 +9,8 @@ export const config = {
   feUrl: 'head-hunter.pl',
   mailPassword: 'admin123',
   mailUsername: 'admin',
+  jwtSecret: 'abc',
+  jwtTimeToExpire: '1y',
+  jwtCookieTimeToExpire: 1000 * 60 * 60 * 24 * 365, //1y
+  maxItemsOnPage: 10,
 };

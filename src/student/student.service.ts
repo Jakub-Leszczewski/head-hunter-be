@@ -33,15 +33,6 @@ import { StudentHelperService } from './student-helper.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
-import {
-  Between,
-  Brackets,
-  DataSource,
-  In,
-  LessThan,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-} from 'typeorm';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 
 @Injectable()
@@ -51,7 +42,6 @@ export class StudentService {
     private userHelperService: UserHelperService,
     private studentHelperService: StudentHelperService,
     private mailService: MailService,
-    private dataSource: DataSource,
   ) {}
 
   async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {
@@ -62,14 +52,14 @@ export class StudentService {
         this.studentHelperService.filterStudentQbCondition(query),
         this.studentHelperService.searchStudentQbCondition(search),
         this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
-        this.studentHelperService.paginationStudentQbCondition(page, 1),
+        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
       )
       .getManyAndCount();
 
     return {
       result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
       totalEntitiesCount,
-      totalPages: Math.ceil(totalEntitiesCount / 30),
+      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
     };
   }
 
