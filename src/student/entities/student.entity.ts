@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { ContractType, StudentInterface, StudentStatus, WorkType } from '../../types';
 import { PortfolioUrl } from './portfolio-url.entity';
@@ -50,6 +58,7 @@ export class Student extends BaseEntity implements StudentInterface {
     nullable: true,
     default: null,
   })
+  @Index({ unique: true })
   public githubUsername: string;
 
   @Column({
