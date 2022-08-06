@@ -29,7 +29,7 @@ export class HrService {
     private mailService: MailService,
   ) {}
 
-  async getStudentsAtInterviewWith(id: string, query: FindAllQueryDto) {
+  async findStudentsAtInterview(id: string, query: FindAllQueryDto) {
     const { search, sortBy, sortMethod, page, status } = query;
 
     const [result, totalEntitiesCount] = await this.studentHelperService

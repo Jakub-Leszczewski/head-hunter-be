@@ -7,10 +7,6 @@ import { GetUserResponse } from '../types/user/user-response';
 export class UserService {
   constructor(private userHelperService: UserHelperService) {}
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
   async findOne(id: string): Promise<GetUserResponse> {
     if (!id) throw new BadRequestException();
 
