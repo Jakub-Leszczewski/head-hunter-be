@@ -6,9 +6,11 @@ import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard'
 import { SetRole } from '../common/decorators/set-role';
 import { UpdateStudentDto } from '../student/dto/update-student.dto';
 import { StudentService } from '../student/student.service';
-import { HrHelperService } from '../hr/hr-helper.service';
 import { HrService } from '../hr/hr.service';
 import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
+import { UserObj } from '../common/decorators/user.decorator';
+import { User } from './entities/user.entity';
+import { ChangeStudentStatusGuard } from '../common/guards/change-student-status.guard';
 
 @Controller('/api/user')
 export class UserController {
@@ -30,6 +32,13 @@ export class UserController {
   @SetRole('admin', 'hr')
   async findOneStudent(@Param('id') id: string): Promise<GetStudentResponse> {
     return this.studentService.findOne(id);
+  }
+
+  @Patch('/:id/student/status')
+  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard, ChangeStudentStatusGuard)
+  @SetRole('admin', 'hr')
+  async changeStudentStatus(@Param('id') id: string, @UserObj() user: User) {
+    return this.studentService.changeStatus(id);
   }
 
   @Get('/:id/hr/student')

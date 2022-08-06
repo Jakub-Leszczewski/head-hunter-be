@@ -246,6 +246,10 @@ export class StudentService {
     return this.insertUrls(urls, student, PortfolioUrl);
   }
 
+  async changeStatus(id: string) {
+    return 'ab';
+  }
+
   async insertUrls(
     urls: string[],
     student: Student,
