@@ -18,9 +18,9 @@ import {
   SetNewPasswordResponse,
 } from '../types';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../common/providers/mail/mail.service';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
-import { hashPwd } from '../utils/hashPwd';
+import { hashPwd } from '../common/utils/hashPwd';
 
 @Injectable()
 export class AuthService {
@@ -58,7 +58,7 @@ export class AuthService {
       maxAge: config.jwtCookieTimeToExpire,
     });
 
-    return this.userHelperService.filterOnlyUser(user);
+    return this.userHelperService.filterUserByRole(user);
   }
 
   async logout(user: User, res: Response): Promise<LogoutResponse> {
@@ -122,5 +122,17 @@ export class AuthService {
     await user.save();
 
     return { ok: true };
+  }
+
+  async getAuthUser(jwtId: string) {
+    if (!jwtId) throw new BadRequestException();
+
+    const user = await User.findOne({
+      where: { jwtId },
+      relations: ['student', 'hr'],
+    });
+    if (!user) throw new NotFoundException();
+
+    return this.userHelperService.filterUserByRole(user);
   }
 }

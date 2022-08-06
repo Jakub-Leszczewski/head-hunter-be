@@ -1,6 +1,16 @@
-import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { ContractType, StudentInterface, WorkType } from '../../types';
+import { ContractType, StudentInterface, StudentStatus, WorkType } from '../../types';
 import { PortfolioUrl } from './portfolio-url.entity';
 import { ProjectUrl } from './project-url.entity';
 import { BonusProjectUrl } from './bonus-project-url.entity';
@@ -9,6 +19,13 @@ import { BonusProjectUrl } from './bonus-project-url.entity';
 export class Student extends BaseEntity implements StudentInterface {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
+
+  @Column({
+    type: 'enum',
+    enum: StudentStatus,
+    default: StudentStatus.Available,
+  })
+  public status: StudentStatus;
 
   @Column({
     type: 'float',
@@ -43,6 +60,7 @@ export class Student extends BaseEntity implements StudentInterface {
     nullable: true,
     default: null,
   })
+  @Index({ unique: true })
   public githubUsername: string;
 
   @Column({
@@ -99,8 +117,7 @@ export class Student extends BaseEntity implements StudentInterface {
     type: 'float',
     precision: 9,
     scale: 2,
-    nullable: true,
-    default: null,
+    default: 0,
   })
   public expectedSalary: number;
 
@@ -124,6 +141,10 @@ export class Student extends BaseEntity implements StudentInterface {
     default: 0,
   })
   public canTakeApprenticeship: boolean;
+
+  @ManyToOne((type) => User, (hr) => hr.studentsAtInterview)
+  @JoinColumn()
+  public interviewWithHr: User;
 
   @OneToMany((type) => BonusProjectUrl, (bonusProjectUrls) => bonusProjectUrls.student)
   public bonusProjectUrls: BonusProjectUrl[];
