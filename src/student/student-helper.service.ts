@@ -10,6 +10,7 @@ import {
   SortBy,
   SortMethod,
   SmallStudentResponse,
+  StudentStatus,
 } from '../types';
 import fetch from 'node-fetch';
 import { User } from '../user/entities/user.entity';
@@ -77,7 +78,7 @@ export class StudentHelperService {
     };
   }
 
-  findAllStudentQb(
+  findAllStudentsQb(
     ...cb: ((qb: SelectQueryBuilder<User>) => SelectQueryBuilder<User>)[]
   ): SelectQueryBuilder<User> {
     const query = this.dataSource
@@ -137,7 +138,7 @@ export class StudentHelperService {
           typeWork: [...typeWork, WorkType.Irrelevant],
         })
         .andWhere('student.canTakeApprenticeship IN (:...canTakeApprenticeship)', {
-          canTakeApprenticeship: [...canTakeApprenticeship],
+          canTakeApprenticeship,
         });
   }
 
@@ -145,9 +146,9 @@ export class StudentHelperService {
     return (qb: SelectQueryBuilder<User>) =>
       qb.andWhere(
         new Brackets((qb) => {
-          qb.where('expectedTypeWork LIKE :search', { search: `%${search}%` })
-            .orWhere('targetWorkCity LIKE :search', { search: `%${search}%` })
-            .orWhere('expectedContractType LIKE :search', { search: `%${search}%` });
+          qb.where('expectedTypeWork LIKE :search', { search: `%${search.toLowerCase()}%` })
+            .orWhere('targetWorkCity LIKE :search', { search: `%${search.toLowerCase()}%` })
+            .orWhere('expectedContractType LIKE :search', { search: `%${search.toLowerCase()}%` });
         }),
       );
   }
@@ -159,5 +160,10 @@ export class StudentHelperService {
 
   paginationStudentQbCondition(page: number, maxOnPage: number) {
     return (qb: SelectQueryBuilder<User>) => qb.skip(maxOnPage * (page - 1)).take(maxOnPage);
+  }
+
+  studentStatusStudentQbCondition(status: StudentStatus[]) {
+    return (qb: SelectQueryBuilder<User>) =>
+      qb.andWhere('student.status IN (:...status)', { status });
   }
 }

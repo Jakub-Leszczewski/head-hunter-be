@@ -35,6 +35,7 @@ export interface UpdateStudentDtoInterface {
 
 export interface FindAllQueryDtoInterface extends FindAllQueryFilter {
   page: number;
+  status: StudentStatus[];
   sortBy: SortBy;
   sortMethod: SortMethod;
   search: string;

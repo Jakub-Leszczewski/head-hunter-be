@@ -1,4 +1,11 @@
-import { ContractType, FindAllQueryDtoInterface, SortBy, SortMethod, WorkType } from '../../types';
+import {
+  ContractType,
+  FindAllQueryDtoInterface,
+  SortBy,
+  SortMethod,
+  StudentStatus,
+  WorkType,
+} from '../../types';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, Max, Min } from 'class-validator';
 import { IsBooleanArray, IsEnumArray } from '../../common/decorators/validation';
 
@@ -7,6 +14,14 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
   @Min(1)
   @IsOptional()
   public page: number = 1;
+
+  @IsEnumArray(StudentStatus)
+  @IsOptional()
+  public status: StudentStatus[] = [
+    StudentStatus.Available,
+    StudentStatus.AtInterview,
+    StudentStatus.Employed,
+  ];
 
   @IsEnum(SortBy)
   @IsOptional()

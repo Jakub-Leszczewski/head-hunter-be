@@ -5,3 +5,4 @@ export * from './student-response';
 export * from './student-status';
 export * from './sort-by';
 export * from './student.dto';
+export * from './work-type';
