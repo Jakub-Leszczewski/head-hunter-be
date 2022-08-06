@@ -29,6 +29,18 @@ export interface StudentInterface {
   user: UserInterface;
 }
 
+export type SmallStudentData = Omit<
+  StudentInterface,
+  | 'bonusProjectUrls'
+  | 'projectUrls'
+  | 'portfolioUrls'
+  | 'user'
+  | 'bio'
+  | 'education'
+  | 'courses'
+  | 'workExperience'
+>;
+
 export type StudentResponseData = Omit<
   StudentInterface,
   'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls' | 'user'

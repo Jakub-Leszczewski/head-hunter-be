@@ -33,7 +33,15 @@ import { StudentHelperService } from './student-helper.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
-import { Between, DataSource, In, LessThan, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import {
+  Between,
+  Brackets,
+  DataSource,
+  In,
+  LessThan,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+} from 'typeorm';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 
 @Injectable()
@@ -47,43 +55,22 @@ export class StudentService {
   ) {}
 
   async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {
-    const {
-      sortBy,
-      sortMethod,
-      courseCompletion,
-      courseEngagement,
-      projectDegree,
-      teamProjectDegree,
-      salaryMin,
-      salaryMax,
-      monthsOfCommercialExp,
-      contractType,
-      typeWork,
-      canTakeApprenticeship,
-    } = query;
+    const { search, sortBy, sortMethod, page } = query;
 
-    console.log(query);
+    const [result, totalEntitiesCount] = await this.studentHelperService
+      .findAllStudentQb(
+        this.studentHelperService.filterStudentQbCondition(query),
+        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
+        this.studentHelperService.paginationStudentQbCondition(page, 1),
+      )
+      .getManyAndCount();
 
-    const user = await User.find({
-      relations: ['student'],
-      where: {
-        role: UserRole.Student,
-        student: {
-          courseCompletion: MoreThanOrEqual(courseCompletion),
-          courseEngagement: MoreThanOrEqual(courseEngagement),
-          projectDegree: MoreThanOrEqual(projectDegree),
-          teamProjectDegree: MoreThanOrEqual(teamProjectDegree),
-          monthsOfCommercialExp: MoreThanOrEqual(monthsOfCommercialExp),
-          expectedSalary: Between(salaryMin, salaryMax),
-          expectedContractType: In([...contractType, ContractType.Irrelevant]),
-          expectedTypeWork: In([...typeWork, ContractType.Irrelevant]),
-          canTakeApprenticeship: In([...canTakeApprenticeship]),
-        },
-      },
-      order: { student: { [sortBy ?? 'id']: sortMethod } },
-    });
-
-    return user;
+    return {
+      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
+      totalEntitiesCount,
+      totalPages: Math.ceil(totalEntitiesCount / 30),
+    };
   }
 
   async findOne(id: string): Promise<GetStudentResponse> {

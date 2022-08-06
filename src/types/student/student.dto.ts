@@ -33,11 +33,14 @@ export interface UpdateStudentDtoInterface {
   canTakeApprenticeship: boolean;
 }
 
-export interface FindAllQueryDtoInterface {
+export interface FindAllQueryDtoInterface extends FindAllQueryFilter {
   page: number;
   sortBy: SortBy;
   sortMethod: SortMethod;
   search: string;
+}
+
+export interface FindAllQueryFilter {
   courseCompletion: number;
   courseEngagement: number;
   projectDegree: number;
