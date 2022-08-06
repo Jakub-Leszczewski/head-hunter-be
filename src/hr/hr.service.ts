@@ -10,7 +10,7 @@ import { UserService } from '../user/user.service';
 import { UserHelperService } from '../user/user-helper.service';
 import { Hr } from './entities/hr.entity';
 import { User } from '../user/entities/user.entity';
-import { CompletionSignupHrResponse, CreateHrResponse, UserRole } from '../types';
+import { CompletionSignupHrResponse, CreateHrResponse, StudentStatus, UserRole } from '../types';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
@@ -30,11 +30,11 @@ export class HrService {
   ) {}
 
   async findStudentsAtInterview(id: string, query: FindAllQueryDto) {
-    const { search, sortBy, sortMethod, page, status } = query;
+    const { search, sortBy, sortMethod, page } = query;
 
     const [result, totalEntitiesCount] = await this.studentHelperService
       .findAllStudentsQb(
-        this.studentHelperService.statusStudentQbCondition(status),
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.AtInterview]),
         this.studentHelperService.filterStudentQbCondition(query),
         this.studentHelperService.searchStudentQbCondition(search),
         this.studentHelperService.interviewWithHrStudentQbCondition(id),
