@@ -25,8 +25,8 @@ export class StudentController {
   constructor(private studentService: StudentService) {}
 
   @Get('/')
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  // @SetRole('admin', 'hr')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole('admin', 'hr')
   async findAll(@Query() query: FindAllQueryDto): Promise<GetStudentsResponse> {
     return this.studentService.findAll(query);
   }
