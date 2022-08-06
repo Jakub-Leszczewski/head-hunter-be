@@ -7,6 +7,7 @@ import { StudentStatus } from './student-status';
 export interface StudentInterface {
   id: string;
   status: StudentStatus;
+  interviewWithHr: UserInterface;
   courseCompletion: number;
   courseEngagement: number;
   projectDegree: number;
@@ -29,8 +30,9 @@ export interface StudentInterface {
   user: UserInterface;
 }
 
-export type SmallStudentData = Omit<
+export type StudentSmallResponseData = Omit<
   StudentInterface,
+  | 'id'
   | 'bonusProjectUrls'
   | 'projectUrls'
   | 'portfolioUrls'
@@ -39,11 +41,12 @@ export type SmallStudentData = Omit<
   | 'education'
   | 'courses'
   | 'workExperience'
+  | 'interviewWithHr'
 >;
 
 export type StudentResponseData = Omit<
   StudentInterface,
-  'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls' | 'user'
+  'id' | 'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls' | 'user' | 'interviewWithHr'
 > & {
   bonusProjectUrls: UrlResponseData[];
   projectUrls: UrlResponseData[];

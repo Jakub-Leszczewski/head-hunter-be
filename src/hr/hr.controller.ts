@@ -7,18 +7,18 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard';
 
-@Controller('/api/user')
+@Controller('/api/hr')
 export class HrController {
   constructor(private readonly hrService: HrService) {}
 
-  @Post('/hr')
+  @Post('/')
   @SetRole('admin')
   @UseGuards(JwtAuthGuard, RoleGuard)
   async importHr(@Body() createHrDto: CreateHrDto) {
     return this.hrService.importHr(createHrDto);
   }
 
-  @Patch('/hr/:userToken')
+  @Patch('/:userToken')
   @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
   async completeSignup(
     @Param('userToken') userToken: string,

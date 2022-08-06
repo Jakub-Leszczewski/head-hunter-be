@@ -6,6 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   Index,
+  OneToMany,
 } from 'typeorm';
 import { UserInterface, UserRole } from '../../types';
 import { Student } from '../../student/entities/student.entity';
@@ -67,6 +68,9 @@ export class User extends BaseEntity implements UserInterface {
 
   @Column()
   public jwtId: string;
+
+  @OneToMany((type) => Student, (student) => student.interviewWithHr)
+  public studentsAtInterview: Student[];
 
   @OneToOne((type) => Student, (student) => student.user, {
     onDelete: 'CASCADE',

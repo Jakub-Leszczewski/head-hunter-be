@@ -16,15 +16,39 @@ import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
 import { HrHelperService } from './hr-helper.service';
 import { hashPwd } from '../common/utils/hashPwd';
+import { StudentHelperService } from '../student/student-helper.service';
+import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
 
 @Injectable()
 export class HrService {
   constructor(
     private userService: UserService,
     private userHelperService: UserHelperService,
+    private studentHelperService: StudentHelperService,
     private hrHelperService: HrHelperService,
     private mailService: MailService,
   ) {}
+
+  async getStudentsAtInterviewWith(id: string, query: FindAllQueryDto) {
+    const { search, sortBy, sortMethod, page, status } = query;
+
+    const [result, totalEntitiesCount] = await this.studentHelperService
+      .findAllStudentsQb(
+        this.studentHelperService.statusStudentQbCondition(status),
+        this.studentHelperService.filterStudentQbCondition(query),
+        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.interviewWithHrStudentQbCondition(id),
+        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
+        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
+      )
+      .getManyAndCount();
+
+    return {
+      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
+      totalEntitiesCount,
+      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
+    };
+  }
 
   async importHr(createHrDto: CreateHrDto): Promise<CreateHrResponse> {
     await this.userHelperService.checkUserFieldUniquenessAndThrow({

@@ -4,9 +4,10 @@ import { HrController } from './hr.controller';
 import { UserModule } from '../user/user.module';
 import { MailModule } from '../common/providers/mail/mail.module';
 import { HrHelperService } from './hr-helper.service';
+import { StudentModule } from '../student/student.module';
 
 @Module({
-  imports: [MailModule, forwardRef(() => UserModule)],
+  imports: [MailModule, forwardRef(() => UserModule), StudentModule],
   controllers: [HrController],
   providers: [HrService, HrHelperService],
   exports: [HrService, HrHelperService],
