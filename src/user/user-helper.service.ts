@@ -1,9 +1,17 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { OnlyUserResponseData, UserResponseData } from '../types';
+import { UserResponseAllData, OnlyUserResponseData, UserResponseData, UserRole } from '../types';
+import { StudentHelperService } from '../student/student-helper.service';
+import { HrHelperService } from '../hr/hr-helper.service';
 
 @Injectable()
 export class UserHelperService {
+  constructor(
+    @Inject(forwardRef(() => StudentHelperService))
+    private studentHelperService: StudentHelperService,
+    @Inject(forwardRef(() => HrHelperService)) private hrHelperService: HrHelperService,
+  ) {}
+
   async checkUserFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
     const user = await User.findOne({
       where: value,
@@ -28,5 +36,22 @@ export class UserHelperService {
     const { student, hr, ...userResponse } = this.filter(userEntity);
 
     return userResponse;
+  }
+
+  filterUserByRole(userEntity: User): UserResponseAllData {
+    switch (userEntity.role) {
+      case UserRole.Admin: {
+        return this.filterOnlyUser(userEntity);
+      }
+      case UserRole.Student: {
+        return this.studentHelperService.filterStudent(userEntity);
+      }
+      case UserRole.Hr: {
+        return this.hrHelperService.filterHr(userEntity);
+      }
+      default: {
+        throw new Error('user role is empty');
+      }
+    }
   }
 }
