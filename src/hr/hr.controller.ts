@@ -6,6 +6,7 @@ import { SetRole } from '../common/decorators/set-role';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { UserOwnerGuard } from '../common/guards/user-owner.guard';
+import { CompletionSignupHrResponse } from '../types';
 
 @Controller('/api/hr')
 export class HrController {
@@ -23,7 +24,7 @@ export class HrController {
   async completeSignup(
     @Param('userToken') userToken: string,
     @Body() completionHrDto: CompletionHrDto,
-  ): Promise<any> {
+  ): Promise<CompletionSignupHrResponse> {
     return this.hrService.completeSignup(userToken, completionHrDto);
   }
 }

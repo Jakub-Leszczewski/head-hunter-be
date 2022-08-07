@@ -7,7 +7,7 @@ import { HrHelperService } from './hr-helper.service';
 import { StudentModule } from '../student/student.module';
 
 @Module({
-  imports: [MailModule, forwardRef(() => UserModule), StudentModule],
+  imports: [MailModule, forwardRef(() => UserModule), forwardRef(() => StudentModule)],
   controllers: [HrController],
   providers: [HrService, HrHelperService],
   exports: [HrService, HrHelperService],

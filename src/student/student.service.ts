@@ -1,19 +1,23 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  ChangeStudentStatusResponse,
+  CompleteStudentResponse,
   ContractType,
   CreateStudentsResponse,
-  UserRole,
-  WorkType,
-  CompleteStudentsResponse,
-  UpdateStudentsResponse,
   GetStudentResponse,
   GetStudentsResponse,
+  StudentStatus,
+  UpdateStudentResponse,
+  UserRole,
+  WorkType,
 } from '../types';
 import { UserService } from '../user/user.service';
 import { Student } from './entities/student.entity';
@@ -34,12 +38,14 @@ import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { ChangeStatusDto } from './dto/change-status.dto';
+import { HrService } from '../hr/hr.service';
 
 @Injectable()
 export class StudentService {
   constructor(
-    private userService: UserService,
-    private userHelperService: UserHelperService,
+    @Inject(forwardRef(() => UserService)) private userService: UserService,
+    @Inject(forwardRef(() => HrService)) private hrService: HrService,
+    @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
     private studentHelperService: StudentHelperService,
     private mailService: MailService,
   ) {}
@@ -133,7 +139,7 @@ export class StudentService {
   async completeSignup(
     userToken: string,
     completionStudentDto: CompletionStudentDto,
-  ): Promise<CompleteStudentsResponse> {
+  ): Promise<CompleteStudentResponse> {
     if (!userToken) throw new BadRequestException();
 
     const { firstName, lastName, email, newPassword, projectUrls, portfolioUrls, ...studentDto } =
@@ -171,7 +177,7 @@ export class StudentService {
     return this.studentHelperService.filterStudent(user);
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<UpdateStudentsResponse> {
+  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<UpdateStudentResponse> {
     if (!id) throw new BadRequestException();
 
     const {
@@ -247,9 +253,31 @@ export class StudentService {
     return this.insertUrls(urls, student, PortfolioUrl);
   }
 
-  async changeStatus(id: string, changeStatusDto: ChangeStatusDto) {
-    // if()
-    return changeStatusDto;
+  async changeStatus(
+    id: string,
+    changeStatusDto: ChangeStatusDto,
+  ): Promise<ChangeStudentStatusResponse> {
+    if (!id || (changeStatusDto.status === StudentStatus.AtInterview && !changeStatusDto.hrId)) {
+      throw new BadRequestException();
+    }
+
+    const user = await this.getStudent({ id });
+    if (!user) throw new NotFoundException();
+
+    if (changeStatusDto.status === StudentStatus.AtInterview) {
+      const hr = await this.hrService.getHr({ id: changeStatusDto.hrId });
+      if (!hr) throw new NotFoundException();
+
+      user.student.status = changeStatusDto.status;
+      user.student.interviewWithHr = hr;
+    } else {
+      user.student.status = changeStatusDto.status;
+      user.student.interviewWithHr = null;
+    }
+
+    await user.student.save();
+
+    return this.studentHelperService.filterStudent(user);
   }
 
   async insertUrls(
@@ -279,6 +307,7 @@ export class StudentService {
         'student.bonusProjectUrls',
         'student.portfolioUrls',
         'student.projectUrls',
+        'student.interviewWithHr',
       ],
     });
   }

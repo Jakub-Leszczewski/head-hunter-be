@@ -1,6 +1,11 @@
 import { Controller, Get, Param, UseGuards, Patch, Body, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { GetUserResponse, GetStudentResponse } from '../types';
+import {
+  GetUserResponse,
+  GetStudentResponse,
+  ChangeStudentStatusResponse,
+  GetStudentsResponse,
+} from '../types';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserOwnerGuard } from '../common/guards/user-owner.guard';
 import { SetRole } from '../common/decorators/set-role';
@@ -8,8 +13,6 @@ import { UpdateStudentDto } from '../student/dto/update-student.dto';
 import { StudentService } from '../student/student.service';
 import { HrService } from '../hr/hr.service';
 import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
-import { UserObj } from '../common/decorators/user.decorator';
-import { User } from './entities/user.entity';
 import { ChangeStudentStatusGuard } from '../common/guards/change-student-status.guard';
 import { ChangeStatusDto } from '../student/dto/change-status.dto';
 
@@ -41,8 +44,7 @@ export class UserController {
   async changeStudentStatus(
     @Param('id') id: string,
     @Body() changeStatusDto: ChangeStatusDto,
-    @UserObj() user: User,
-  ) {
+  ): Promise<ChangeStudentStatusResponse> {
     return this.studentService.changeStatus(id, changeStatusDto);
   }
 
@@ -52,7 +54,7 @@ export class UserController {
   async findStudentsAtInterview(
     @Param('id') id: string,
     @Query() query: FindAllQueryDto,
-  ): Promise<any> {
+  ): Promise<GetStudentsResponse> {
     return this.hrService.findStudentsAtInterview(id, query);
   }
 

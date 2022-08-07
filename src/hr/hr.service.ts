@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,7 +12,13 @@ import { UserService } from '../user/user.service';
 import { UserHelperService } from '../user/user-helper.service';
 import { Hr } from './entities/hr.entity';
 import { User } from '../user/entities/user.entity';
-import { CompletionSignupHrResponse, CreateHrResponse, StudentStatus, UserRole } from '../types';
+import {
+  CompletionSignupHrResponse,
+  CreateHrResponse,
+  GetStudentsResponse,
+  StudentStatus,
+  UserRole,
+} from '../types';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
@@ -22,14 +30,15 @@ import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
 @Injectable()
 export class HrService {
   constructor(
-    private userService: UserService,
-    private userHelperService: UserHelperService,
+    @Inject(forwardRef(() => UserService)) private userService: UserService,
+    @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
+    @Inject(forwardRef(() => HrHelperService)) private hrHelperService: HrHelperService,
+    @Inject(forwardRef(() => StudentHelperService))
     private studentHelperService: StudentHelperService,
-    private hrHelperService: HrHelperService,
     private mailService: MailService,
   ) {}
 
-  async findStudentsAtInterview(id: string, query: FindAllQueryDto) {
+  async findStudentsAtInterview(id: string, query: FindAllQueryDto): Promise<GetStudentsResponse> {
     const { search, sortBy, sortMethod, page } = query;
 
     const [result, totalEntitiesCount] = await this.studentHelperService

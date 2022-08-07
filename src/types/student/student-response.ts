@@ -16,5 +16,6 @@ export type GetStudentsResponse = {
   totalPages: number;
 };
 export type CreateStudentsResponse = StudentResponse[];
-export type CompleteStudentsResponse = StudentResponse;
-export type UpdateStudentsResponse = StudentResponse;
+export type CompleteStudentResponse = StudentResponse;
+export type UpdateStudentResponse = StudentResponse;
+export type ChangeStudentStatusResponse = StudentResponse;
