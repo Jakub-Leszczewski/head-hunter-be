@@ -39,7 +39,7 @@ import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { ChangeStatusDto } from './dto/change-status.dto';
 import { HrService } from '../hr/hr.service';
-import { NotificationService } from '../admin/notification.service';
+import { AdminService } from '../admin/admin.service';
 
 @Injectable()
 export class StudentService {
@@ -48,7 +48,7 @@ export class StudentService {
     @Inject(forwardRef(() => HrService)) private hrService: HrService,
     @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
     private studentHelperService: StudentHelperService,
-    private notificationService: NotificationService,
+    private notificationService: AdminService,
     private mailService: MailService,
   ) {}
 

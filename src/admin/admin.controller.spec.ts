@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminController } from './admin.controller';
-import { NotificationService } from './notification.service';
+import { AdminService } from './admin.service';
 
 describe('AdminController', () => {
   let controller: AdminController;
@@ -8,7 +8,7 @@ describe('AdminController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AdminController],
-      providers: [NotificationService],
+      providers: [AdminService],
     }).compile();
 
     controller = module.get<AdminController>(AdminController);
