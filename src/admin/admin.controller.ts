@@ -10,7 +10,7 @@ export class AdminController {
   constructor(private readonly notificationService: AdminService) {}
 
   @Get('/notification')
-  // @UseGuards(RoleGuard)
+  @UseGuards(RoleGuard)
   @SetRole('admin')
   async findAllNotifications(
     @Query() query: FindAllNotificationQueryDto,
