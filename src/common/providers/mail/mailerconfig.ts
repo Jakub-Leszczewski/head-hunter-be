@@ -8,7 +8,7 @@ export = {
     from: 'no-reply@head-hunter.pl',
   },
   template: {
-    dir: join(__dirname, '../../src/mail/templates'),
+    dir: join(__dirname, '../../../../src/common/providers/mail/templates'),
     adapter: new HandlebarsAdapter(),
     options: {
       strict: true,

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ConflictException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
   UrlInterface,
   UrlResponseData,
@@ -86,6 +86,20 @@ export class StudentHelperService {
       ...userResponse,
       student: { ...studentResponse },
     };
+  }
+
+  async checkStudentFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
+    const user = await User.findOne({
+      where: { student: value },
+    });
+
+    return !user;
+  }
+
+  async checkStudentFieldUniquenessAndThrow(value: { [key: string]: any }) {
+    const fieldUniqueness = await this.checkStudentFieldUniqueness(value);
+
+    if (!fieldUniqueness) throw new ConflictException();
   }
 
   findAllStudentsQb(

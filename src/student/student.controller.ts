@@ -32,15 +32,14 @@ export class StudentController {
   }
 
   @Post('/')
-  @SetRole('admin')
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  // @SetRole('admin')
+  // @UseGuards(JwtAuthGuard, RoleGuard)
   @UsePipes(ArrayValidationPipe(ImportStudentDto))
   async create(@Body() createUserDto: ImportStudentDto[]): Promise<CreateStudentsResponse> {
     return this.studentService.importStudents(createUserDto);
   }
 
   @Patch('/:userToken')
-  @UseGuards(JwtAuthGuard, UserOwnerGuard)
   completeSignup(
     @Param('userToken') userToken: string,
     @Body() updateUserDto: CompletionStudentDto,

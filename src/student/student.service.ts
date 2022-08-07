@@ -156,6 +156,10 @@ export class StudentService {
     if (!(await this.studentHelperService.checkGithubExist(completionStudentDto.githubUsername)))
       throw new NotFoundException('Not found github account');
 
+    await this.studentHelperService.checkStudentFieldUniquenessAndThrow({
+      githubUsername: completionStudentDto.githubUsername,
+    });
+
     if (completionStudentDto.email && completionStudentDto.email === user.email) {
       await this.userHelperService.checkUserFieldUniquenessAndThrow({
         email: completionStudentDto.email,
