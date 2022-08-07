@@ -89,6 +89,7 @@ export class AuthService {
     if (!user.isActive) throw new ForbiddenException();
 
     user.userToken = uuid();
+    user.userTokenExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 10);
     await user.save();
 
     await this.mailService.sendForgotPassword(user.email, {
@@ -120,9 +121,11 @@ export class AuthService {
     const user = await User.findOne({ where: { userToken } });
     if (!user) throw new NotFoundException();
     if (!user.isActive) throw new ForbiddenException();
+    if (user.userTokenExpiredAt < new Date()) throw new ForbiddenException();
 
     user.hashPwd = await hashPwd(newPassword);
     user.userToken = null;
+    user.userTokenExpiredAt = null;
     await user.save();
 
     return { ok: true };

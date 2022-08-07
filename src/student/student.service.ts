@@ -118,6 +118,7 @@ export class StudentService {
         user.role = UserRole.Student;
         user.isActive = false;
         user.userToken = uuid();
+        user.userTokenExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 14);
         await user.save();
 
         user.student = student;
@@ -150,6 +151,7 @@ export class StudentService {
     const user = await this.getStudent({ userToken });
     if (!user || !user.student) throw new NotFoundException();
     if (user.isActive) throw new ForbiddenException();
+    if (user.userTokenExpiredAt < new Date()) throw new ForbiddenException();
 
     if (!(await this.studentHelperService.checkGithubExist(completionStudentDto.githubUsername)))
       throw new NotFoundException('Not found github account');
@@ -168,6 +170,7 @@ export class StudentService {
     user.hashPwd = await hashPwd(newPassword);
     user.isActive = true;
     user.userToken = null;
+    user.userTokenExpiredAt = null;
 
     await user.student.reload();
     user.student.projectUrls = await this.insertUrls(projectUrls, user.student, ProjectUrl);
