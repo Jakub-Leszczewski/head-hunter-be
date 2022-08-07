@@ -4,12 +4,16 @@ import { Notification } from './entities/notification.entity';
 import { FindAllNotificationQueryDto } from './dto/find-all-notification-query.dto';
 import { Brackets, DataSource } from 'typeorm';
 import { config } from '../config/config';
+import { NotificationResponse } from '../types';
+import { GetNotificationsResponse } from '../types/admin/notification-response';
 
 @Injectable()
 export class AdminService {
   constructor(private dataSource: DataSource) {}
 
-  async findAllNotifications(query: FindAllNotificationQueryDto) {
+  async findAllNotifications(
+    query: FindAllNotificationQueryDto,
+  ): Promise<GetNotificationsResponse> {
     const { page, search } = query;
     const [result, totalEntitiesCount] = await this.dataSource
       .createQueryBuilder()
@@ -26,7 +30,7 @@ export class AdminService {
       .getManyAndCount();
 
     return {
-      result: result.map((e) => this.filter(e)),
+      result: result.map((e) => this.filterNotification(e)),
       totalEntitiesCount,
       totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
     };
@@ -49,7 +53,7 @@ export class AdminService {
     await notification.save();
   }
 
-  filter(notification: Notification) {
+  filterNotification(notification: Notification): NotificationResponse {
     const { user, ...notificationResponse } = notification;
 
     return notificationResponse;
