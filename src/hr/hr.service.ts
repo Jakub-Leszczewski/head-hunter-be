@@ -45,7 +45,7 @@ export class HrService {
       .findAllStudentsQb(
         this.studentHelperService.statusStudentQbCondition([StudentStatus.AtInterview]),
         this.studentHelperService.filterStudentQbCondition(query),
-        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.searchStudentByNameQbCondition(search),
         this.studentHelperService.interviewWithHrStudentQbCondition(id),
         this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
         this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),

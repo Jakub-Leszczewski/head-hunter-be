@@ -123,16 +123,4 @@ export class AuthService {
 
     return { ok: true };
   }
-
-  async getAuthUser(jwtId: string) {
-    if (!jwtId) throw new BadRequestException();
-
-    const user = await User.findOne({
-      where: { jwtId },
-      relations: ['student', 'hr'],
-    });
-    if (!user) throw new NotFoundException();
-
-    return this.userHelperService.filterUserByRole(user);
-  }
 }
