@@ -1,20 +1,37 @@
-import { Controller, Post, Body, Patch, Param, UsePipes, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UsePipes,
+  UseGuards,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { StudentService } from './student.service';
 import { ImportStudentDto } from './dto/import-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
-import { ArrayValidationPipe } from '../pipes/ArrayValidationPipe';
-import { CreateStudentsResponse } from '../types';
+import { ArrayValidationPipe } from '../common/pipes/ArrayValidationPipe';
+import { CreateStudentsResponse, GetStudentsResponse } from '../types';
 import { CompletionStudentDto } from './dto/completion-student.dto';
-import { SetRole } from '../decorators/set-role';
-import { UserOwnerOrRoleGuard } from '../guards/user-owner-or-role.guard';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { RoleGuard } from '../guards/role.guard';
+import { SetRole } from '../common/decorators/set-role';
+import { UserOwnerGuard } from '../common/guards/user-owner.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RoleGuard } from '../common/guards/role.guard';
+import { FindAllQueryDto } from './dto/find-all-query.dto';
 
-@Controller('/api/user')
+@Controller('/api/student')
 export class StudentController {
-  constructor(private readonly studentService: StudentService) {}
+  constructor(private studentService: StudentService) {}
 
-  @Post('/student')
+  @Get('/')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole('admin', 'hr')
+  async findAll(@Query() query: FindAllQueryDto): Promise<GetStudentsResponse> {
+    return this.studentService.findAll(query);
+  }
+
+  @Post('/')
   @SetRole('admin')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @UsePipes(ArrayValidationPipe(ImportStudentDto))
@@ -22,19 +39,12 @@ export class StudentController {
     return this.studentService.importStudents(createUserDto);
   }
 
-  @Patch('/student/:userToken')
-  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
+  @Patch('/:userToken')
+  @UseGuards(JwtAuthGuard, UserOwnerGuard)
   completeSignup(
     @Param('userToken') userToken: string,
     @Body() updateUserDto: CompletionStudentDto,
   ) {
     return this.studentService.completeSignup(userToken, updateUserDto);
-  }
-
-  @Patch(':id/student')
-  @SetRole('admin')
-  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
-  update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
-    return this.studentService.update(id, updateStudentDto);
   }
 }
