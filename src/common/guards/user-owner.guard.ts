@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { User } from '../../user/entities/user.entity';
 
 @Injectable()
-export class UserOwnerOrRoleGuard implements CanActivate {
+export class UserOwnerGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {

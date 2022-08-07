@@ -15,7 +15,7 @@ import { ArrayValidationPipe } from '../common/pipes/ArrayValidationPipe';
 import { CreateStudentsResponse, GetStudentsResponse } from '../types';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { SetRole } from '../common/decorators/set-role';
-import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard';
+import { UserOwnerGuard } from '../common/guards/user-owner.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
@@ -40,7 +40,7 @@ export class StudentController {
   }
 
   @Patch('/:userToken')
-  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
+  @UseGuards(JwtAuthGuard, UserOwnerGuard)
   completeSignup(
     @Param('userToken') userToken: string,
     @Body() updateUserDto: CompletionStudentDto,

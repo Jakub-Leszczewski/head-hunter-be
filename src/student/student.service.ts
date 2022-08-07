@@ -33,6 +33,7 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
+import { ChangeStatusDto } from './dto/change-status.dto';
 
 @Injectable()
 export class StudentService {
@@ -246,8 +247,9 @@ export class StudentService {
     return this.insertUrls(urls, student, PortfolioUrl);
   }
 
-  async changeStatus(id: string) {
-    return 'ab';
+  async changeStatus(id: string, changeStatusDto: ChangeStatusDto) {
+    // if()
+    return changeStatusDto;
   }
 
   async insertUrls(

@@ -9,7 +9,8 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { User } from '../../user/entities/user.entity';
 import { DataSource } from 'typeorm';
-import { StudentStatus } from '../../types';
+import { StudentStatus, UserRole } from '../../types';
+import { ChangeStatusDto } from '../../student/dto/change-status.dto';
 
 @Injectable()
 export class ChangeStudentStatusGuard implements CanActivate {
@@ -17,8 +18,11 @@ export class ChangeStudentStatusGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
+    const handler = context.getHandler();
     const user = request.user as User;
     const ownerId = request.params?.id;
+    const body: ChangeStatusDto = request.body;
+    const roles = this.reflector.get<string[]>('auth_role', handler);
 
     if (!ownerId) throw new BadRequestException();
     if (!user) throw new Error('User is undefined');
@@ -34,14 +38,14 @@ export class ChangeStudentStatusGuard implements CanActivate {
 
     if (!student) throw new NotFoundException();
 
-    console.log(student, student.status, StudentStatus.Available);
-    if (
-      user.id === ownerId ||
-      user.id === student.interviewWithHr?.id ||
-      student.status === StudentStatus.Available
-    )
-      return true;
-
-    return false;
+    return (
+      roles?.includes(user.role) ||
+      (body.status === StudentStatus.Employed && ownerId === user.id) ||
+      (student.status === StudentStatus.AtInterview && student.interviewWithHr.id === user.id) ||
+      (student.status === StudentStatus.Available &&
+        body.status === StudentStatus.AtInterview &&
+        user.role === UserRole.Hr &&
+        body.hrId === user.id)
+    );
   }
 }

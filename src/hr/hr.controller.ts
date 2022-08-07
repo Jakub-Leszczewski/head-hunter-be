@@ -5,7 +5,7 @@ import { CompletionHrDto } from './dto/completion-hr.dto';
 import { SetRole } from '../common/decorators/set-role';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
-import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard';
+import { UserOwnerGuard } from '../common/guards/user-owner.guard';
 
 @Controller('/api/hr')
 export class HrController {
@@ -19,7 +19,7 @@ export class HrController {
   }
 
   @Patch('/:userToken')
-  @UseGuards(JwtAuthGuard, UserOwnerOrRoleGuard)
+  @UseGuards(JwtAuthGuard, UserOwnerGuard)
   async completeSignup(
     @Param('userToken') userToken: string,
     @Body() completionHrDto: CompletionHrDto,
