@@ -5,6 +5,7 @@ import { Notification } from './entities/notification.entity';
 @Injectable()
 export class NotificationService {
   findAllNotifications() {
+    const notifications = Notification.findAndCount();
     return `This action returns all admin`;
   }
 

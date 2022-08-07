@@ -273,17 +273,22 @@ export class StudentService {
       user.student.status = changeStatusDto.status;
       user.student.interviewWithHr = hr;
     } else {
+      if (changeStatusDto.status === StudentStatus.Employed) {
+        await this.notificationService.createNotification(
+          `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony przez ${
+            user.student.interviewWithHr?.firstName ?? ''
+          } ${user.student.interviewWithHr?.lastName ?? ''} (${
+            user.student.interviewWithHr?.id ?? 'nieznany'
+          })`,
+          id,
+        );
+      }
+
       user.student.status = changeStatusDto.status;
       user.student.interviewWithHr = null;
     }
 
     await user.student.save();
-    if (changeStatusDto.status === StudentStatus.Employed) {
-      await this.notificationService.createNotification(
-        `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony`,
-        id,
-      );
-    }
 
     return this.studentHelperService.filterStudent(user);
   }
