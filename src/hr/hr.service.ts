@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,21 +12,52 @@ import { UserService } from '../user/user.service';
 import { UserHelperService } from '../user/user-helper.service';
 import { Hr } from './entities/hr.entity';
 import { User } from '../user/entities/user.entity';
-import { CompletionSignupHrResponse, CreateHrResponse, UserRole } from '../types';
+import {
+  CompletionSignupHrResponse,
+  CreateHrResponse,
+  GetStudentsResponse,
+  StudentStatus,
+  UserRole,
+} from '../types';
 import { v4 as uuid } from 'uuid';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
 import { HrHelperService } from './hr-helper.service';
-import { hashPwd } from '../utils/hashPwd';
+import { hashPwd } from '../common/utils/hashPwd';
+import { StudentHelperService } from '../student/student-helper.service';
+import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
 
 @Injectable()
 export class HrService {
   constructor(
-    private userService: UserService,
-    private userHelperService: UserHelperService,
-    private hrHelperService: HrHelperService,
+    @Inject(forwardRef(() => UserService)) private userService: UserService,
+    @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
+    @Inject(forwardRef(() => HrHelperService)) private hrHelperService: HrHelperService,
+    @Inject(forwardRef(() => StudentHelperService))
+    private studentHelperService: StudentHelperService,
     private mailService: MailService,
   ) {}
+
+  async findStudentsAtInterview(id: string, query: FindAllQueryDto): Promise<GetStudentsResponse> {
+    const { search, sortBy, sortMethod, page } = query;
+
+    const [result, totalEntitiesCount] = await this.studentHelperService
+      .findAllStudentsQb(
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.AtInterview]),
+        this.studentHelperService.filterStudentQbCondition(query),
+        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.interviewWithHrStudentQbCondition(id),
+        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
+        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
+      )
+      .getManyAndCount();
+
+    return {
+      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
+      totalEntitiesCount,
+      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
+    };
+  }
 
   async importHr(createHrDto: CreateHrDto): Promise<CreateHrResponse> {
     await this.userHelperService.checkUserFieldUniquenessAndThrow({
