@@ -12,10 +12,11 @@ import { v4 as uuid } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { UserHelperService } from '../user/user-helper.service';
 import {
-  ResetPasswordResponse,
   LoginResponse,
   LogoutResponse,
+  ResetPasswordResponse,
   SetNewPasswordResponse,
+  StudentStatus,
 } from '../types';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailService } from '../common/providers/mail/mail.service';
@@ -37,6 +38,9 @@ export class AuthService {
     });
 
     if (user) {
+      if (user.student?.status === StudentStatus.Employed)
+        throw new ForbiddenException('you have already been employed');
+
       const hashCompareResult = await compare(password, user.hashPwd);
 
       if (hashCompareResult) {
