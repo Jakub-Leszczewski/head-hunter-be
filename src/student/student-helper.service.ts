@@ -48,6 +48,7 @@ export class StudentHelperService {
       user,
       id,
       interviewWithHr,
+      interviewExpiredAt,
       ...studentResponse
     } = student;
 
@@ -79,6 +80,7 @@ export class StudentHelperService {
       courses,
       workExperience,
       interviewWithHr,
+      interviewExpiredAt,
       ...studentResponse
     } = student;
 

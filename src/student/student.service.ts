@@ -122,7 +122,10 @@ export class StudentService {
         await user.save();
 
         user.student = student;
+        student.user = user;
+
         await user.save();
+        await student.save();
 
         await this.mailService.sendStudentSignupEmail(user.email, {
           signupUrl: `${config.feUrl}/signup/student/${user.id}/${user.userToken}`,
@@ -279,6 +282,7 @@ export class StudentService {
 
       user.student.status = changeStatusDto.status;
       user.student.interviewWithHr = hr;
+      user.student.interviewExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10);
     } else {
       if (changeStatusDto.status === StudentStatus.Employed) {
         await this.notificationService.createNotification(
@@ -293,6 +297,7 @@ export class StudentService {
 
       user.student.status = changeStatusDto.status;
       user.student.interviewWithHr = null;
+      user.student.interviewExpiredAt = null;
     }
 
     await user.student.save();

@@ -142,7 +142,16 @@ export class Student extends BaseEntity implements StudentInterface {
   })
   public canTakeApprenticeship: boolean;
 
-  @ManyToOne((type) => User, (hr) => hr.studentsAtInterview)
+  @Column({
+    type: 'datetime',
+    default: null,
+    nullable: true,
+  })
+  public interviewExpiredAt: Date;
+
+  @ManyToOne((type) => User, (hr) => hr.studentsAtInterview, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn()
   public interviewWithHr: User;
 
@@ -155,6 +164,9 @@ export class Student extends BaseEntity implements StudentInterface {
   @OneToMany((type) => PortfolioUrl, (portfolioUrls) => portfolioUrls.student)
   public portfolioUrls: PortfolioUrl[];
 
-  @OneToOne((type) => User, (user) => user.student)
+  @OneToOne((type) => User, (user) => user.student, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   public user: User;
 }

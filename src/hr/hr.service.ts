@@ -80,7 +80,9 @@ export class HrService {
     await user.save();
 
     user.hr = hr;
+    hr.user = user;
     await user.save();
+    await hr.save();
 
     await this.mailService.sendHrSignupEmail(user.email, {
       signupUrl: `${config.feUrl}/signup/hr/${user.id}/${user.userToken}`,
