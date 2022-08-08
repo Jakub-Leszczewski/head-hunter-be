@@ -11,6 +11,7 @@ import {
 import { UserInterface, UserRole } from '../../types';
 import { Student } from '../../student/entities/student.entity';
 import { Hr } from '../../hr/entities/hr.entity';
+import { Notification } from '../../admin/entities/notification.entity';
 
 @Entity()
 export class User extends BaseEntity implements UserInterface {
@@ -83,4 +84,7 @@ export class User extends BaseEntity implements UserInterface {
   })
   @JoinColumn()
   public hr: Hr;
+
+  @OneToMany((type) => Notification, (notification) => notification.user)
+  public notifications: Notification[];
 }

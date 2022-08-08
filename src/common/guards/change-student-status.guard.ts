@@ -27,7 +27,7 @@ export class ChangeStudentStatusGuard implements CanActivate {
     if (!ownerId) throw new BadRequestException();
     if (!user) throw new Error('User is undefined');
 
-    const { student } = await this.dataSource
+    const userStudent = await this.dataSource
       .createQueryBuilder()
       .select(['user.id', 'student.id', 'student.status', 'interviewWithHr.id'])
       .from(User, 'user')
@@ -36,7 +36,10 @@ export class ChangeStudentStatusGuard implements CanActivate {
       .where('user.id=:ownerId', { ownerId })
       .getOne();
 
-    if (!student) throw new NotFoundException();
+    if (!userStudent) throw new NotFoundException();
+    if (!userStudent.student) throw new Error(`Student is undefined in user: ${userStudent.id}`);
+
+    const { student } = userStudent;
 
     return (
       roles?.includes(user.role) ||

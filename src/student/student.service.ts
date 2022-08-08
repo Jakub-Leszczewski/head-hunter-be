@@ -39,6 +39,7 @@ import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { ChangeStatusDto } from './dto/change-status.dto';
 import { HrService } from '../hr/hr.service';
+import { NotificationService } from '../admin/notification.service';
 
 @Injectable()
 export class StudentService {
@@ -47,6 +48,7 @@ export class StudentService {
     @Inject(forwardRef(() => HrService)) private hrService: HrService,
     @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
     private studentHelperService: StudentHelperService,
+    private notificationService: NotificationService,
     private mailService: MailService,
   ) {}
 
@@ -276,6 +278,12 @@ export class StudentService {
     }
 
     await user.student.save();
+    if (changeStatusDto.status === StudentStatus.Employed) {
+      await this.notificationService.createNotification(
+        `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony`,
+        id,
+      );
+    }
 
     return this.studentHelperService.filterStudent(user);
   }
