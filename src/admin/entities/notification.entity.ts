@@ -18,7 +18,9 @@ export class Notification extends BaseEntity implements NotificationInterface {
   })
   public createdAt: Date;
 
-  @ManyToOne((type) => User, (user) => user.notifications)
+  @ManyToOne((type) => User, (user) => user.notifications, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn()
   public user: User;
 }

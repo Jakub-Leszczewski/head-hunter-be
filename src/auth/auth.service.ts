@@ -12,10 +12,11 @@ import { v4 as uuid } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { UserHelperService } from '../user/user-helper.service';
 import {
-  ResetPasswordResponse,
   LoginResponse,
   LogoutResponse,
+  ResetPasswordResponse,
   SetNewPasswordResponse,
+  StudentStatus,
 } from '../types';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailService } from '../common/providers/mail/mail.service';
@@ -37,6 +38,9 @@ export class AuthService {
     });
 
     if (user) {
+      if (user.student?.status === StudentStatus.Employed)
+        throw new ForbiddenException('you have already been employed');
+
       const hashCompareResult = await compare(password, user.hashPwd);
 
       if (hashCompareResult) {
@@ -85,6 +89,7 @@ export class AuthService {
     if (!user.isActive) throw new ForbiddenException();
 
     user.userToken = uuid();
+    user.userTokenExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 10);
     await user.save();
 
     await this.mailService.sendForgotPassword(user.email, {
@@ -116,23 +121,13 @@ export class AuthService {
     const user = await User.findOne({ where: { userToken } });
     if (!user) throw new NotFoundException();
     if (!user.isActive) throw new ForbiddenException();
+    if (user.userTokenExpiredAt < new Date()) throw new ForbiddenException();
 
     user.hashPwd = await hashPwd(newPassword);
     user.userToken = null;
+    user.userTokenExpiredAt = null;
     await user.save();
 
     return { ok: true };
-  }
-
-  async getAuthUser(jwtId: string) {
-    if (!jwtId) throw new BadRequestException();
-
-    const user = await User.findOne({
-      where: { jwtId },
-      relations: ['student', 'hr'],
-    });
-    if (!user) throw new NotFoundException();
-
-    return this.userHelperService.filterUserByRole(user);
   }
 }

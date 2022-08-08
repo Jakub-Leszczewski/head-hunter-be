@@ -67,6 +67,13 @@ export class User extends BaseEntity implements UserInterface {
   @Index({ unique: true })
   public userToken: string;
 
+  @Column({
+    type: 'datetime',
+    nullable: true,
+    default: null,
+  })
+  public userTokenExpiredAt: Date;
+
   @Column()
   public jwtId: string;
 

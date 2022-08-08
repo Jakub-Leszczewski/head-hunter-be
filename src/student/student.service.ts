@@ -118,10 +118,14 @@ export class StudentService {
         user.role = UserRole.Student;
         user.isActive = false;
         user.userToken = uuid();
+        user.userTokenExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 14);
         await user.save();
 
         user.student = student;
+        student.user = user;
+
         await user.save();
+        await student.save();
 
         await this.mailService.sendStudentSignupEmail(user.email, {
           signupUrl: `${config.feUrl}/signup/student/${user.id}/${user.userToken}`,
@@ -150,9 +154,14 @@ export class StudentService {
     const user = await this.getStudent({ userToken });
     if (!user || !user.student) throw new NotFoundException();
     if (user.isActive) throw new ForbiddenException();
+    if (user.userTokenExpiredAt < new Date()) throw new ForbiddenException();
 
     if (!(await this.studentHelperService.checkGithubExist(completionStudentDto.githubUsername)))
       throw new NotFoundException('Not found github account');
+
+    await this.studentHelperService.checkStudentFieldUniquenessAndThrow({
+      githubUsername: completionStudentDto.githubUsername,
+    });
 
     if (completionStudentDto.email && completionStudentDto.email === user.email) {
       await this.userHelperService.checkUserFieldUniquenessAndThrow({
@@ -168,6 +177,7 @@ export class StudentService {
     user.hashPwd = await hashPwd(newPassword);
     user.isActive = true;
     user.userToken = null;
+    user.userTokenExpiredAt = null;
 
     await user.student.reload();
     user.student.projectUrls = await this.insertUrls(projectUrls, user.student, ProjectUrl);
@@ -272,6 +282,7 @@ export class StudentService {
 
       user.student.status = changeStatusDto.status;
       user.student.interviewWithHr = hr;
+      user.student.interviewExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10);
     } else {
       if (changeStatusDto.status === StudentStatus.Employed) {
         await this.notificationService.createNotification(
@@ -286,6 +297,7 @@ export class StudentService {
 
       user.student.status = changeStatusDto.status;
       user.student.interviewWithHr = null;
+      user.student.interviewExpiredAt = null;
     }
 
     await user.student.save();

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ConflictException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
   UrlInterface,
   UrlResponseData,
@@ -48,6 +48,7 @@ export class StudentHelperService {
       user,
       id,
       interviewWithHr,
+      interviewExpiredAt,
       ...studentResponse
     } = student;
 
@@ -79,6 +80,7 @@ export class StudentHelperService {
       courses,
       workExperience,
       interviewWithHr,
+      interviewExpiredAt,
       ...studentResponse
     } = student;
 
@@ -86,6 +88,20 @@ export class StudentHelperService {
       ...userResponse,
       student: { ...studentResponse },
     };
+  }
+
+  async checkStudentFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
+    const user = await User.findOne({
+      where: { student: value },
+    });
+
+    return !user;
+  }
+
+  async checkStudentFieldUniquenessAndThrow(value: { [key: string]: any }) {
+    const fieldUniqueness = await this.checkStudentFieldUniqueness(value);
+
+    if (!fieldUniqueness) throw new ConflictException();
   }
 
   findAllStudentsQb(
@@ -112,7 +128,8 @@ export class StudentHelperService {
       .from(User, 'user')
       .leftJoin('user.student', 'student')
       .leftJoin('student.interviewWithHr', 'interviewWithHr')
-      .where('user.role=:role', { role: UserRole.Student });
+      .where('user.role=:role', { role: UserRole.Student })
+      .andWhere('user.isActive=:isActive', { isActive: true });
 
     return cb.reduce((prev, curr) => curr(prev), query);
   }
@@ -157,9 +174,24 @@ export class StudentHelperService {
     return (qb: SelectQueryBuilder<User>) =>
       qb.andWhere(
         new Brackets((qb) => {
-          qb.where('expectedTypeWork LIKE :search', { search: `%${search.toLowerCase()}%` })
-            .orWhere('targetWorkCity LIKE :search', { search: `%${search.toLowerCase()}%` })
-            .orWhere('expectedContractType LIKE :search', { search: `%${search.toLowerCase()}%` });
+          qb.where('student.expectedTypeWork LIKE :search', { search: `%${search.toLowerCase()}%` })
+            .orWhere('student.targetWorkCity LIKE :search', { search: `%${search.toLowerCase()}%` })
+            .orWhere('student.expectedContractType LIKE :search', {
+              search: `%${search.toLowerCase()}%`,
+            });
+        }),
+      );
+  }
+
+  searchStudentByNameQbCondition(search: string) {
+    return (qb: SelectQueryBuilder<User>) =>
+      qb.andWhere(
+        new Brackets((qb) => {
+          qb.where('user.firstName LIKE :search', { search: `%${search.toLowerCase()}%` })
+            .orWhere('user.lastName LIKE :search', { search: `%${search.toLowerCase()}%` })
+            .orWhere('CONCAT(user.firstName, " ", user.lastName) LIKE :search', {
+              search: `%${search.toLowerCase()}%`,
+            });
         }),
       );
   }

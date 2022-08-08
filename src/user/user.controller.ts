@@ -15,8 +15,10 @@ import { HrService } from '../hr/hr.service';
 import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
 import { ChangeStudentStatusGuard } from '../common/guards/change-student-status.guard';
 import { ChangeStatusDto } from '../student/dto/change-status.dto';
+import { OnlyActiveUserGuard } from '../common/guards/only-active-user.guard';
 
 @Controller('/api/user')
+@UseGuards(JwtAuthGuard, OnlyActiveUserGuard)
 export class UserController {
   constructor(
     private userService: UserService,
@@ -25,21 +27,21 @@ export class UserController {
   ) {}
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, UserOwnerGuard)
+  @UseGuards(UserOwnerGuard)
   @SetRole('admin')
   async findOne(@Param('id') id: string): Promise<GetUserResponse> {
     return this.userService.findOne(id);
   }
 
   @Get('/:id/student')
-  @UseGuards(JwtAuthGuard, UserOwnerGuard)
+  @UseGuards(UserOwnerGuard)
   @SetRole('admin', 'hr')
   async findOneStudent(@Param('id') id: string): Promise<GetStudentResponse> {
     return this.studentService.findOne(id);
   }
 
   @Patch('/:id/student/status')
-  @UseGuards(JwtAuthGuard, ChangeStudentStatusGuard)
+  @UseGuards(ChangeStudentStatusGuard)
   @SetRole('admin')
   async changeStudentStatus(
     @Param('id') id: string,
@@ -49,7 +51,7 @@ export class UserController {
   }
 
   @Get('/:id/hr/student')
-  @UseGuards(JwtAuthGuard, UserOwnerGuard)
+  @UseGuards(UserOwnerGuard)
   @SetRole('admin')
   async findStudentsAtInterview(
     @Param('id') id: string,
@@ -60,7 +62,7 @@ export class UserController {
 
   @Patch('/:id/student')
   @SetRole('admin')
-  @UseGuards(JwtAuthGuard, UserOwnerGuard)
+  @UseGuards(UserOwnerGuard)
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(id, updateStudentDto);
   }

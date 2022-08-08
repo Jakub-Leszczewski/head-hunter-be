@@ -27,7 +27,7 @@ export class UserHelperService {
   }
 
   filter(userEntity: User): UserResponseData {
-    const { jwtId, hashPwd, userToken, ...userResponse } = userEntity;
+    const { jwtId, hashPwd, userToken, userTokenExpiredAt, ...userResponse } = userEntity;
 
     return userResponse;
   }

@@ -11,14 +11,15 @@ export interface UserInterface {
   role: UserRole;
   isActive: boolean;
   userToken: string | null;
+  userTokenExpiredAt: Date | null;
   jwtId: string | null;
   student?: StudentInterface | null;
   hr?: HrInterface | null;
 }
 
-export type UserResponseData = Omit<UserInterface, 'hashPwd' | 'userToken' | 'jwtId'>;
-export type OnlyUserResponseData = Omit<
+export type UserResponseData = Omit<
   UserInterface,
-  'hashPwd' | 'userToken' | 'jwtId' | 'student' | 'hr'
+  'hashPwd' | 'userToken' | 'jwtId' | 'userTokenExpiredAt'
 >;
+export type OnlyUserResponseData = Omit<UserResponseData, 'student' | 'hr'>;
 export type UserResponseAllData = OnlyUserResponseData | HrResponseData | StudentResponseData;

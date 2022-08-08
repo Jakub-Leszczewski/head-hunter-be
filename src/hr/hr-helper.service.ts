@@ -11,7 +11,7 @@ export class HrHelperService {
 
   filterHr(userEntity: User): HrResponse {
     const { hr, student, ...userResponse } = this.userHelperService.filter(userEntity);
-    const { user, ...hrResponse } = hr;
+    const { user, id, ...hrResponse } = hr;
 
     return {
       ...userResponse,

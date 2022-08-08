@@ -24,6 +24,7 @@ export interface StudentInterface {
   expectedContractType: ContractType;
   expectedTypeWork: WorkType;
   canTakeApprenticeship: boolean;
+  interviewExpiredAt: Date | null;
   bonusProjectUrls: UrlInterface[];
   projectUrls: UrlInterface[];
   portfolioUrls: UrlInterface[];
@@ -42,11 +43,18 @@ export type StudentSmallResponseData = Omit<
   | 'courses'
   | 'workExperience'
   | 'interviewWithHr'
+  | 'interviewExpiredAt'
 >;
 
 export type StudentResponseData = Omit<
   StudentInterface,
-  'id' | 'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls' | 'user' | 'interviewWithHr'
+  | 'id'
+  | 'bonusProjectUrls'
+  | 'projectUrls'
+  | 'portfolioUrls'
+  | 'user'
+  | 'interviewWithHr'
+  | 'interviewExpiredAt'
 > & {
   bonusProjectUrls: UrlResponseData[];
   projectUrls: UrlResponseData[];

@@ -45,7 +45,7 @@ export class HrService {
       .findAllStudentsQb(
         this.studentHelperService.statusStudentQbCondition([StudentStatus.AtInterview]),
         this.studentHelperService.filterStudentQbCondition(query),
-        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.searchStudentByNameQbCondition(search),
         this.studentHelperService.interviewWithHrStudentQbCondition(id),
         this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
         this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
@@ -76,10 +76,13 @@ export class HrService {
     user.role = UserRole.Hr;
     user.isActive = false;
     user.userToken = uuid();
+    user.userTokenExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 14);
     await user.save();
 
     user.hr = hr;
+    hr.user = user;
     await user.save();
+    await hr.save();
 
     await this.mailService.sendHrSignupEmail(user.email, {
       signupUrl: `${config.feUrl}/signup/hr/${user.id}/${user.userToken}`,
@@ -97,10 +100,12 @@ export class HrService {
     const user = await this.getHr({ userToken });
     if (!user || !user.hr) throw new NotFoundException();
     if (user.isActive) throw new ForbiddenException();
+    if (user.userTokenExpiredAt < new Date()) throw new ForbiddenException();
 
     user.hashPwd = await hashPwd(newPassword);
     user.isActive = true;
     user.userToken = null;
+    user.userTokenExpiredAt = null;
     await user.save();
 
     return this.hrHelperService.filterHr(user);
