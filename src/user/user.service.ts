@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UserHelperService } from './user-helper.service';
-import { FindUserResponse } from '../types/user/user-response';
+import { GetUserResponse } from '../types/user/user-response';
 
 @Injectable()
 export class UserService {
@@ -11,7 +11,7 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  async findOne(id: string): Promise<FindUserResponse> {
+  async findOne(id: string): Promise<GetUserResponse> {
     if (!id) throw new BadRequestException();
 
     const user = await User.findOne({

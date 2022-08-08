@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { UserObj } from '../decorators/user.decorator';
+import { UserObj } from '../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -22,7 +22,7 @@ import {
   SetNewPasswordResponse,
   GetAuthUserResponse,
 } from '../types';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
 import { UserHelperService } from '../user/user-helper.service';

@@ -3,7 +3,7 @@ import { StudentService } from './student.service';
 import { StudentController } from './student.controller';
 import { UserModule } from '../user/user.module';
 import { StudentHelperService } from './student-helper.service';
-import { MailModule } from '../mail/mail.module';
+import { MailModule } from '../common/providers/mail/mail.module';
 
 @Module({
   imports: [MailModule, forwardRef(() => UserModule)],

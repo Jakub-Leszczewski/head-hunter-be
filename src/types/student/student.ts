@@ -1,5 +1,5 @@
 import { ContractType } from './contract-type';
-import { WorkType } from '../user/work-type';
+import { WorkType } from '../user';
 import { UrlInterface, UrlResponseData } from './url';
 import { UserInterface } from '../user';
 import { StudentStatus } from './student-status';
@@ -19,7 +19,7 @@ export interface StudentInterface {
   monthsOfCommercialExp: number;
   workExperience: string | null;
   targetWorkCity: string | null;
-  expectedSalary: number | null;
+  expectedSalary: number;
   expectedContractType: ContractType;
   expectedTypeWork: WorkType;
   canTakeApprenticeship: boolean;
@@ -28,6 +28,18 @@ export interface StudentInterface {
   portfolioUrls: UrlInterface[];
   user: UserInterface;
 }
+
+export type SmallStudentData = Omit<
+  StudentInterface,
+  | 'bonusProjectUrls'
+  | 'projectUrls'
+  | 'portfolioUrls'
+  | 'user'
+  | 'bio'
+  | 'education'
+  | 'courses'
+  | 'workExperience'
+>;
 
 export type StudentResponseData = Omit<
   StudentInterface,
