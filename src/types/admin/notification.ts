@@ -6,3 +6,5 @@ export interface NotificationInterface {
   createdAt: Date;
   user: UserInterface;
 }
+
+export type NotificationResponse = Omit<NotificationInterface, 'user'>;

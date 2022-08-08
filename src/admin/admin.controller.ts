@@ -1,11 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
-import { NotificationService } from './notification.service';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { AdminService } from './admin.service';
+import { RoleGuard } from '../common/guards/role.guard';
+import { SetRole } from '../common/decorators/set-role';
+import { FindAllNotificationQueryDto } from './dto/find-all-notification-query.dto';
+import { GetNotificationsResponse } from '../types/admin/notification-response';
 
-@Controller('admin')
+@Controller('/api/admin')
 export class AdminController {
-  constructor(private readonly adminService: NotificationService) {}
-  @Get()
-  findAllNotifications() {
-    return this.adminService.findAllNotifications();
+  constructor(private readonly notificationService: AdminService) {}
+
+  @Get('/notification')
+  @UseGuards(RoleGuard)
+  @SetRole('admin')
+  async findAllNotifications(
+    @Query() query: FindAllNotificationQueryDto,
+  ): Promise<GetNotificationsResponse> {
+    return this.notificationService.findAllNotifications(query);
   }
 }
