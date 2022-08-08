@@ -12,7 +12,7 @@ import {
 import { StudentService } from './student.service';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { ArrayValidationPipe } from '../common/pipes/ArrayValidationPipe';
-import { CreateStudentsResponse, GetStudentsResponse, SortBy } from '../types';
+import { CreateStudentsResponse, GetStudentsResponse } from '../types';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { SetRole } from '../common/decorators/set-role';
 import { UserOwnerOrRoleGuard } from '../common/guards/user-owner-or-role.guard';
@@ -25,8 +25,8 @@ export class StudentController {
   constructor(private studentService: StudentService) {}
 
   @Get('/')
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  // @SetRole('admin', 'hr')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole('admin', 'hr')
   async findAll(@Query() query: FindAllQueryDto): Promise<GetStudentsResponse> {
     return this.studentService.findAll(query);
   }

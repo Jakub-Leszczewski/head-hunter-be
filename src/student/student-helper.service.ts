@@ -41,7 +41,15 @@ export class StudentHelperService {
 
   filterStudent(userEntity: User): StudentResponse {
     const { hr, student, ...userResponse } = this.userHelperService.filter(userEntity);
-    const { bonusProjectUrls, portfolioUrls, projectUrls, user, ...studentResponse } = student;
+    const {
+      bonusProjectUrls,
+      portfolioUrls,
+      projectUrls,
+      user,
+      id,
+      interviewWithHr,
+      ...studentResponse
+    } = student;
 
     const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
     const newPortfolioUrls = this.filterUrl(portfolioUrls);
@@ -61,6 +69,7 @@ export class StudentHelperService {
   filterSmallStudent(userEntity: User): SmallStudentResponse {
     const { hr, student, ...userResponse } = this.userHelperService.filter(userEntity);
     const {
+      id,
       bonusProjectUrls,
       portfolioUrls,
       projectUrls,
@@ -69,6 +78,7 @@ export class StudentHelperService {
       education,
       courses,
       workExperience,
+      interviewWithHr,
       ...studentResponse
     } = student;
 
@@ -101,6 +111,7 @@ export class StudentHelperService {
       ])
       .from(User, 'user')
       .leftJoin('user.student', 'student')
+      .leftJoin('student.interviewWithHr', 'interviewWithHr')
       .where('user.role=:role', { role: UserRole.Student });
 
     return cb.reduce((prev, curr) => curr(prev), query);
@@ -162,8 +173,12 @@ export class StudentHelperService {
     return (qb: SelectQueryBuilder<User>) => qb.skip(maxOnPage * (page - 1)).take(maxOnPage);
   }
 
-  studentStatusStudentQbCondition(status: StudentStatus[]) {
+  statusStudentQbCondition(status: StudentStatus[]) {
     return (qb: SelectQueryBuilder<User>) =>
       qb.andWhere('student.status IN (:...status)', { status });
+  }
+
+  interviewWithHrStudentQbCondition(hrId: string) {
+    return (qb: SelectQueryBuilder<User>) => qb.andWhere('interviewWithHr.id=:hrId', { hrId });
   }
 }

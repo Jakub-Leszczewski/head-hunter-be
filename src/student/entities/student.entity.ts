@@ -3,6 +3,8 @@ import {
   Column,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -139,6 +141,10 @@ export class Student extends BaseEntity implements StudentInterface {
     default: 0,
   })
   public canTakeApprenticeship: boolean;
+
+  @ManyToOne((type) => User, (hr) => hr.studentsAtInterview)
+  @JoinColumn()
+  public interviewWithHr: User;
 
   @OneToMany((type) => BonusProjectUrl, (bonusProjectUrls) => bonusProjectUrls.student)
   public bonusProjectUrls: BonusProjectUrl[];

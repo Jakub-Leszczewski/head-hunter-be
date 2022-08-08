@@ -1,12 +1,12 @@
 import { UserResponseData } from '../user';
-import { SmallStudentData, StudentResponseData } from './student';
+import { StudentSmallResponseData, StudentResponseData } from './student';
 
 export type StudentResponse = Omit<UserResponseData, 'student' | 'hr'> & {
   student: StudentResponseData;
 };
 
 export type SmallStudentResponse = Omit<UserResponseData, 'student' | 'hr'> & {
-  student: SmallStudentData;
+  student: StudentSmallResponseData;
 };
 
 export type GetStudentResponse = StudentResponse;

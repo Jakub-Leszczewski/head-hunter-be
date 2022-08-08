@@ -14,7 +14,6 @@ import {
   UpdateStudentsResponse,
   GetStudentResponse,
   GetStudentsResponse,
-  SortBy,
 } from '../types';
 import { UserService } from '../user/user.service';
 import { Student } from './entities/student.entity';
@@ -47,10 +46,9 @@ export class StudentService {
   async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {
     const { search, sortBy, sortMethod, page, status } = query;
 
-    console.log(query, status);
     const [result, totalEntitiesCount] = await this.studentHelperService
       .findAllStudentsQb(
-        this.studentHelperService.studentStatusStudentQbCondition(status),
+        this.studentHelperService.statusStudentQbCondition(status),
         this.studentHelperService.filterStudentQbCondition(query),
         this.studentHelperService.searchStudentQbCondition(search),
         this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
