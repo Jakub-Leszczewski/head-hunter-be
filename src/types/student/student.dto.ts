@@ -53,3 +53,7 @@ export interface FindAllQueryFilter {
   canTakeApprenticeship: boolean[];
   monthsOfCommercialExp: number;
 }
+
+export interface ChangeStatusDtoInterface {
+  status: StudentStatus;
+}
