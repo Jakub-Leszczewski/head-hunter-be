@@ -4,13 +4,10 @@ import { ContractType, WorkType } from '../../types';
 import {
   ArrayNotEmpty,
   IsBoolean,
-  IsDefined,
   IsEmail,
   IsEnum,
   IsInt,
   IsMobilePhone,
-  IsNotEmpty,
-  IsNotIn,
   IsNumber,
   IsString,
   IsUrl,
@@ -18,7 +15,6 @@ import {
   Matches,
   Max,
   Min,
-  ValidateIf,
 } from 'class-validator';
 import { IsNotNull } from '../../common/decorators/validation';
 

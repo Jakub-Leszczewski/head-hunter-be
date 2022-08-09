@@ -1,8 +1,8 @@
-import { WorkType } from '../user';
 import { ContractType } from './contract-type';
 import { SortBy } from './sort-by';
 import { SortMethod } from '../sort-method';
 import { StudentStatus } from './student-status';
+import { WorkType } from './work-type';
 
 export interface CreateStudentDtoInterface {
   email: string;

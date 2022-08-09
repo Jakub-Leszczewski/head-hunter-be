@@ -1,8 +1,8 @@
 import { ContractType } from './contract-type';
-import { WorkType } from '../user';
 import { UrlInterface, UrlResponseData } from './url';
 import { UserInterface } from '../user';
 import { StudentStatus } from './student-status';
+import { WorkType } from './work-type';
 
 export interface StudentInterface {
   id: string;
