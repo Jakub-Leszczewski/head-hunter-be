@@ -1,6 +1,7 @@
 import { IsEmail, IsInt, IsString, Length, Max, MaxLength, Min } from 'class-validator';
+import { CreateHrDtoInterface } from '../../types';
 
-export class CreateHrDto {
+export class CreateHrDto implements CreateHrDtoInterface {
   @IsEmail()
   @MaxLength(256)
   public email: string;

@@ -17,6 +17,8 @@ export interface UpdateStudentDtoInterface {
   lastName: string;
   firstName: string;
   email: string;
+  password: string;
+  newPassword: string;
   githubUsername: string;
   bio: string;
   phoneNumber: string;
