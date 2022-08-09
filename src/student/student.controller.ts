@@ -15,7 +15,6 @@ import { ArrayValidationPipe } from '../common/pipes/ArrayValidationPipe';
 import { CreateStudentsResponse, GetStudentsResponse } from '../types';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { SetRole } from '../common/decorators/set-role';
-import { UserOwnerGuard } from '../common/guards/user-owner.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
@@ -32,8 +31,8 @@ export class StudentController {
   }
 
   @Post('/')
-  // @SetRole('admin')
-  // @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @UsePipes(ArrayValidationPipe(ImportStudentDto))
   async create(@Body() createUserDto: ImportStudentDto[]): Promise<CreateStudentsResponse> {
     return this.studentService.importStudents(createUserDto);
