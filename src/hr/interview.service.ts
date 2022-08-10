@@ -41,12 +41,6 @@ export class InterviewService {
     if (!hrId || !id) throw new BadRequestException();
     await this.checkInterviewExistAndThrow(id, hrId);
 
-    const interviewCount = await Interview.count({
-      where: {
-        hr: { id: hrId },
-      },
-    });
-
     const student = await User.findOne({
       where: {
         id: id,
@@ -64,7 +58,6 @@ export class InterviewService {
       relations: ['hr'],
     });
     if (!hr) throw new NotFoundException();
-    if (hr.hr?.maxReservedStudents <= interviewCount) throw new ForbiddenException();
 
     const interview = new Interview();
     interview.student = student;

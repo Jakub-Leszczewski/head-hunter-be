@@ -19,6 +19,7 @@ import { OnlyActiveUserGuard } from '../common/guards/only-active-user.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { InterviewService } from '../hr/interview.service';
 import { ChangeInterviewGuard } from '../common/guards/change-interview.guard';
+import { HrMaxInterviewGuard } from '../common/guards/hr-max-interview.guard';
 
 @Controller('/api/user')
 @UseGuards(JwtAuthGuard, OnlyActiveUserGuard)
@@ -61,7 +62,7 @@ export class UserController {
   }
 
   @Patch('/:id/student/interview')
-  @UseGuards(ChangeInterviewGuard)
+  @UseGuards(ChangeInterviewGuard, HrMaxInterviewGuard)
   @SetRole('admin')
   async createInterview(
     @Param('id') id: string,
