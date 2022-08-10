@@ -5,7 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
-import { StudentStatus, UserRole } from '../types';
+import {
+  CreateInterviewResponse,
+  GetStudentsResponse,
+  RemoveInterviewResponse,
+  StudentStatus,
+  UserRole,
+} from '../types';
 import { Interview } from './entities/interview.entity';
 import { config } from '../config/config';
 import { StudentHelperService } from '../student/student-helper.service';
@@ -15,7 +21,7 @@ import { ChangeStatusInterviewDto } from './dto/change-status-interview.dto';
 export class InterviewService {
   constructor(private studentHelperService: StudentHelperService) {}
 
-  async findAllHrInterview(id: string, query) {
+  async findAllHrInterview(id: string, query): Promise<GetStudentsResponse> {
     const { search, sortBy, sortMethod, page } = query;
 
     const [result, totalEntitiesCount] = await this.studentHelperService
@@ -36,7 +42,10 @@ export class InterviewService {
     };
   }
 
-  async createInterview(id: string, { hrId }: ChangeStatusInterviewDto) {
+  async createInterview(
+    id: string,
+    { hrId }: ChangeStatusInterviewDto,
+  ): Promise<CreateInterviewResponse> {
     if (!hrId || !id) throw new BadRequestException();
     await this.checkInterviewExistAndThrow(id, hrId);
 
@@ -72,7 +81,10 @@ export class InterviewService {
     };
   }
 
-  async removeInterview(id: string, { hrId }: ChangeStatusInterviewDto) {
+  async removeInterview(
+    id: string,
+    { hrId }: ChangeStatusInterviewDto,
+  ): Promise<RemoveInterviewResponse> {
     if (!id) throw new BadRequestException();
 
     const interview = await Interview.findOne({

@@ -3,8 +3,10 @@ import { UserService } from './user.service';
 import {
   GetUserResponse,
   GetStudentResponse,
-  ChangeStudentStatusResponse,
   GetStudentsResponse,
+  ChangeStudentEmployedStatusResponse,
+  CreateInterviewResponse,
+  RemoveInterviewResponse,
 } from '../types';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserOwnerGuard } from '../common/guards/user-owner.guard';
@@ -66,7 +68,7 @@ export class UserController {
   async createInterview(
     @Param('id') id: string,
     @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
-  ) {
+  ): Promise<CreateInterviewResponse> {
     return this.interviewService.createInterview(id, changeStatusInterviewDto);
   }
 
@@ -76,14 +78,16 @@ export class UserController {
   async removeInterview(
     @Param('id') id: string,
     @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
-  ) {
+  ): Promise<RemoveInterviewResponse> {
     return this.interviewService.removeInterview(id, changeStatusInterviewDto);
   }
 
   @Patch('/:id/student/employed')
   @UseGuards(ChangeEmployedStatusGuard, StudentNotEmployedGuard)
   @SetRole('admin')
-  async changeEmployedStatus(@Param('id') id: string) {
+  async changeEmployedStatus(
+    @Param('id') id: string,
+  ): Promise<ChangeStudentEmployedStatusResponse> {
     return this.studentService.changeEmployedStatus(id);
   }
 }

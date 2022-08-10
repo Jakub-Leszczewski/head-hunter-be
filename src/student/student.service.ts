@@ -8,6 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  ChangeStudentEmployedStatusResponse,
   CompleteStudentResponse,
   ContractType,
   CreateStudentsResponse,
@@ -265,7 +266,7 @@ export class StudentService {
     return this.insertUrls(urls, student, PortfolioUrl);
   }
 
-  async changeEmployedStatus(id: string) {
+  async changeEmployedStatus(id: string): Promise<ChangeStudentEmployedStatusResponse> {
     if (!id) throw new BadRequestException();
 
     const user = await User.findOne({
