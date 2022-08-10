@@ -25,7 +25,6 @@ export class UserController {
   constructor(
     private userService: UserService,
     private studentService: StudentService,
-    private hrService: HrService,
     private interviewService: InterviewService,
   ) {}
 
@@ -70,7 +69,7 @@ export class UserController {
     @Param('id') id: string,
     @Query() query: FindAllQueryDto,
   ): Promise<GetStudentsResponse> {
-    return this.hrService.findStudentsAtInterview(id, query);
+    return this.interviewService.findAllHrInterview(id, query);
   }
 
   @Patch('/:id/student')

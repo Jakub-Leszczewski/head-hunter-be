@@ -8,10 +8,33 @@ import {
 import { User } from '../user/entities/user.entity';
 import { StudentStatus, UserRole } from '../types';
 import { Interview } from './entities/interview.entity';
+import { config } from '../config/config';
+import { StudentHelperService } from '../student/student-helper.service';
 
 @Injectable()
 export class InterviewService {
-  async findAllHrInterview(id: string) {}
+  constructor(private studentHelperService: StudentHelperService) {}
+
+  async findAllHrInterview(id: string, query) {
+    const { search, sortBy, sortMethod, page } = query;
+
+    const [result, totalEntitiesCount] = await this.studentHelperService
+      .findAllStudentsQb(
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.Available]),
+        this.studentHelperService.filterStudentQbCondition(query),
+        this.studentHelperService.searchStudentByNameQbCondition(search),
+        this.studentHelperService.interviewWithHrStudentQbCondition(id),
+        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
+        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
+      )
+      .getManyAndCount();
+
+    return {
+      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
+      totalEntitiesCount,
+      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
+    };
+  }
 
   async createInterview(studentId: string, hrId: string) {
     if (!hrId || !studentId) throw new BadRequestException();

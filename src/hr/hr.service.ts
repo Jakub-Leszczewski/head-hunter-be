@@ -38,26 +38,9 @@ export class HrService {
     private mailService: MailService,
   ) {}
 
-  async findStudentsAtInterview(id: string, query: FindAllQueryDto): Promise<GetStudentsResponse> {
-    const { search, sortBy, sortMethod, page } = query;
-
-    const [result, totalEntitiesCount] = await this.studentHelperService
-      .findAllStudentsQb(
-        this.studentHelperService.statusStudentQbCondition([StudentStatus.Available]),
-        this.studentHelperService.filterStudentQbCondition(query),
-        this.studentHelperService.searchStudentByNameQbCondition(search),
-        this.studentHelperService.interviewWithHrStudentQbCondition(id),
-        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
-        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
-      )
-      .getManyAndCount();
-
-    return {
-      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
-      totalEntitiesCount,
-      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
-    };
-  }
+  // async findStudentsAtInterview(id: string, query: FindAllQueryDto): Promise<GetStudentsResponse> {
+  //
+  // }
 
   async importHr(createHrDto: CreateHrDto): Promise<CreateHrResponse> {
     await this.userHelperService.checkUserFieldUniquenessAndThrow({
