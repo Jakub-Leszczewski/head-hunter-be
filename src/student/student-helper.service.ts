@@ -1,16 +1,16 @@
 import { ConflictException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
-  UrlInterface,
-  UrlResponseData,
-  StudentResponse,
-  UserRole,
   ContractType,
-  WorkType,
   FindAllQueryFilter,
+  SmallStudentResponse,
   SortBy,
   SortMethod,
-  SmallStudentResponse,
+  StudentResponse,
   StudentStatus,
+  UrlInterface,
+  UrlResponseData,
+  UserRole,
+  WorkType,
 } from '../types';
 import fetch from 'node-fetch';
 import { User } from '../user/entities/user.entity';
@@ -58,6 +58,7 @@ export class StudentHelperService {
 
     return {
       ...userResponse,
+      role: UserRole.Student,
       student: {
         ...studentResponse,
         bonusProjectUrls: newBonusProjectUrls ? [...newBonusProjectUrls] : null,
@@ -86,6 +87,7 @@ export class StudentHelperService {
 
     return {
       ...userResponse,
+      role: UserRole.Student,
       student: { ...studentResponse },
     };
   }

@@ -1,6 +1,6 @@
 import { ConflictException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { UserResponseAllData, OnlyUserResponseData, UserResponseData, UserRole } from '../types';
+import { AdminResponse, UserResponseAllData, UserResponseData, UserRole } from '../types';
 import { StudentHelperService } from '../student/student-helper.service';
 import { HrHelperService } from '../hr/hr-helper.service';
 
@@ -32,16 +32,16 @@ export class UserHelperService {
     return userResponse;
   }
 
-  filterOnlyUser(userEntity: User): OnlyUserResponseData {
+  filterAdmin(userEntity: User): AdminResponse {
     const { student, hr, ...userResponse } = this.filter(userEntity);
 
-    return userResponse;
+    return { ...userResponse, role: UserRole.Admin };
   }
 
   filterUserByRole(userEntity: User): UserResponseAllData {
     switch (userEntity.role) {
       case UserRole.Admin: {
-        return this.filterOnlyUser(userEntity);
+        return this.filterAdmin(userEntity);
       }
       case UserRole.Student: {
         return this.studentHelperService.filterStudent(userEntity);

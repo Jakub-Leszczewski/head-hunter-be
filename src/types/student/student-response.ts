@@ -1,12 +1,14 @@
-import { UserResponseData } from '../user';
+import { UserResponseData, UserRole } from '../user';
 import { StudentSmallResponseData, StudentResponseData } from './student';
 
-export type StudentResponse = Omit<UserResponseData, 'student' | 'hr'> & {
+export type StudentResponse = Omit<UserResponseData, 'student' | 'hr' | 'role'> & {
   student: StudentResponseData;
+  role: UserRole.Student;
 };
 
-export type SmallStudentResponse = Omit<UserResponseData, 'student' | 'hr'> & {
+export type SmallStudentResponse = Omit<UserResponseData, 'student' | 'hr' | 'role'> & {
   student: StudentSmallResponseData;
+  role: UserRole.Student;
 };
 
 export type GetStudentResponse = StudentResponse;

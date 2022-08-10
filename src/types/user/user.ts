@@ -1,6 +1,6 @@
 import { UserRole } from './user-role';
-import { StudentInterface, StudentResponseData } from '../student';
-import { HrInterface, HrResponseData } from '../hr';
+import { StudentInterface, StudentResponse } from '../student';
+import { HrInterface, HrResponse } from '../hr';
 
 export interface UserInterface {
   id: string;
@@ -21,5 +21,11 @@ export type UserResponseData = Omit<
   UserInterface,
   'hashPwd' | 'userToken' | 'jwtId' | 'userTokenExpiredAt'
 >;
-export type OnlyUserResponseData = Omit<UserResponseData, 'student' | 'hr'>;
-export type UserResponseAllData = OnlyUserResponseData | HrResponseData | StudentResponseData;
+
+export type OnlyUserResponse = Omit<UserResponseData, 'student' | 'hr'>;
+
+export type AdminResponse = Omit<OnlyUserResponse, 'role'> & {
+  role: UserRole.Admin;
+};
+
+export type UserResponseAllData = AdminResponse | StudentResponse | HrResponse;
