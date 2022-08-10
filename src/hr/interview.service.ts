@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -12,8 +13,9 @@ import { Interview } from './entities/interview.entity';
 export class InterviewService {
   async findAllHrInterview(id: string) {}
 
-  async createInterview(hrId: string, studentId: string) {
+  async createInterview(studentId: string, hrId: string) {
     if (!hrId || !studentId) throw new BadRequestException();
+    await this.checkInterviewExistAndThrow(studentId, hrId);
 
     const interviewCount = await Interview.count({
       where: {
@@ -35,10 +37,10 @@ export class InterviewService {
         id: hrId,
         role: UserRole.Hr,
       },
+      relations: ['hr'],
     });
-
     if (!hr) throw new NotFoundException();
-    if (hr.hr.maxReservedStudents >= interviewCount) throw new ForbiddenException();
+    if (hr.hr?.maxReservedStudents <= interviewCount) throw new ForbiddenException();
 
     const interview = new Interview();
     interview.student = student;
@@ -52,5 +54,24 @@ export class InterviewService {
       studentId: interview.student.id,
       expiredAt: interview.expiredAt,
     };
+  }
+
+  async checkInterviewExist(studentId: string, hrId: string): Promise<boolean> {
+    if (!studentId || !hrId) throw new Error('studentId or hrId is empty');
+
+    const interview = await Interview.findOne({
+      where: {
+        hr: { id: hrId },
+        student: { id: studentId },
+      },
+    });
+
+    return !!interview;
+  }
+
+  async checkInterviewExistAndThrow(studentId: string, hrId: string) {
+    const interviewExist = await this.checkInterviewExist(studentId, hrId);
+
+    if (interviewExist) throw new ConflictException();
   }
 }

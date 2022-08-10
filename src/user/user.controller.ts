@@ -60,7 +60,7 @@ export class UserController {
   @UseGuards(RoleGuard)
   @SetRole('admin', 'hr')
   async createInterview(@Param('id') id: string, @Body() { hrId }: ChangeStatusInterviewDto) {
-    await this.interviewService.createInterview(id, hrId);
+    return this.interviewService.createInterview(id, hrId);
   }
 
   @Get('/:id/hr/student')
