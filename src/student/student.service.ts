@@ -37,7 +37,7 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
-import { ChangeStatusInterviewDto } from './dto/change-status-interview.dto';
+import { ChangeStatusInterviewDto } from '../hr/dto/change-status-interview.dto';
 import { HrService } from '../hr/hr.service';
 import { AdminService } from '../admin/admin.service';
 

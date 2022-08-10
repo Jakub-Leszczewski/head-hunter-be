@@ -10,6 +10,7 @@ import { StudentStatus, UserRole } from '../types';
 import { Interview } from './entities/interview.entity';
 import { config } from '../config/config';
 import { StudentHelperService } from '../student/student-helper.service';
+import { ChangeStatusInterviewDto } from './dto/change-status-interview.dto';
 
 @Injectable()
 export class InterviewService {
@@ -36,9 +37,9 @@ export class InterviewService {
     };
   }
 
-  async createInterview(studentId: string, hrId: string) {
-    if (!hrId || !studentId) throw new BadRequestException();
-    await this.checkInterviewExistAndThrow(studentId, hrId);
+  async createInterview(id: string, { hrId }: ChangeStatusInterviewDto) {
+    if (!hrId || !id) throw new BadRequestException();
+    await this.checkInterviewExistAndThrow(id, hrId);
 
     const interviewCount = await Interview.count({
       where: {
@@ -48,7 +49,7 @@ export class InterviewService {
 
     const student = await User.findOne({
       where: {
-        id: studentId,
+        id: id,
         role: UserRole.Student,
         student: { status: StudentStatus.Available },
       },
@@ -73,6 +74,27 @@ export class InterviewService {
 
     return {
       id: interview.id,
+      hrId: interview.hr.id,
+      studentId: interview.student.id,
+      expiredAt: interview.expiredAt,
+    };
+  }
+
+  async removeInterview(id: string, { hrId }: ChangeStatusInterviewDto) {
+    if (!id) throw new BadRequestException();
+
+    const interview = await Interview.findOne({
+      where: {
+        student: { id: id },
+        hr: { id: hrId },
+      },
+      relations: ['hr', 'student'],
+    });
+    if (!interview) throw new NotFoundException();
+
+    await interview.remove();
+
+    return {
       hrId: interview.hr.id,
       studentId: interview.student.id,
       expiredAt: interview.expiredAt,

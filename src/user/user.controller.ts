@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Patch, Body, Query } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Patch, Body, Query, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   GetUserResponse,
@@ -14,7 +14,7 @@ import { StudentService } from '../student/student.service';
 import { HrService } from '../hr/hr.service';
 import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
 import { ChangeStudentStatusGuard } from '../common/guards/change-student-status.guard';
-import { ChangeStatusInterviewDto } from '../student/dto/change-status-interview.dto';
+import { ChangeStatusInterviewDto } from '../hr/dto/change-status-interview.dto';
 import { OnlyActiveUserGuard } from '../common/guards/only-active-user.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { InterviewService } from '../hr/interview.service';
@@ -58,8 +58,21 @@ export class UserController {
   @Patch('/:id/student/interview')
   @UseGuards(RoleGuard)
   @SetRole('admin', 'hr')
-  async createInterview(@Param('id') id: string, @Body() { hrId }: ChangeStatusInterviewDto) {
-    return this.interviewService.createInterview(id, hrId);
+  async createInterview(
+    @Param('id') id: string,
+    @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
+  ) {
+    return this.interviewService.createInterview(id, changeStatusInterviewDto);
+  }
+
+  @Delete('/:id/student/interview')
+  @UseGuards(RoleGuard)
+  @SetRole('admin', 'hr')
+  async removeInterview(
+    @Param('id') id: string,
+    @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
+  ) {
+    return this.interviewService.removeInterview(id, changeStatusInterviewDto);
   }
 
   @Get('/:id/hr/student')

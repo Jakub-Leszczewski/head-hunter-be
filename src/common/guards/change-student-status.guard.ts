@@ -10,7 +10,7 @@ import { Request } from 'express';
 import { User } from '../../user/entities/user.entity';
 import { DataSource } from 'typeorm';
 import { StudentStatus, UserRole } from '../../types';
-import { ChangeStatusInterviewDto } from '../../student/dto/change-status-interview.dto';
+import { ChangeStatusInterviewDto } from '../../hr/dto/change-status-interview.dto';
 
 @Injectable()
 export class ChangeStudentStatusGuard implements CanActivate {
