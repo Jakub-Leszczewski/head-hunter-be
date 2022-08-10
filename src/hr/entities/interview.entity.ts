@@ -10,7 +10,7 @@ export class Interview extends BaseEntity implements InterviewInterface {
   @Column({
     type: 'datetime',
   })
-  public expiredAt: string;
+  public expiredAt: Date;
 
   @ManyToOne((type) => User)
   @JoinColumn()

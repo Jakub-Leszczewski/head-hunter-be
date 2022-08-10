@@ -10,7 +10,7 @@ import { Request } from 'express';
 import { User } from '../../user/entities/user.entity';
 import { DataSource } from 'typeorm';
 import { StudentStatus, UserRole } from '../../types';
-import { ChangeStatusDto } from '../../student/dto/change-status.dto';
+import { ChangeStatusInterviewDto } from '../../student/dto/change-status-interview.dto';
 
 @Injectable()
 export class ChangeStudentStatusGuard implements CanActivate {
@@ -21,7 +21,7 @@ export class ChangeStudentStatusGuard implements CanActivate {
     const handler = context.getHandler();
     const user = request.user as User;
     const ownerId = request.params?.id;
-    const body: ChangeStatusDto = request.body;
+    const body: ChangeStatusInterviewDto = request.body;
     const roles = this.reflector.get<string[]>('auth_role', handler);
 
     if (!ownerId) throw new BadRequestException();

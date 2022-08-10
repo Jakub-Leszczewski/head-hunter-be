@@ -14,8 +14,10 @@ import { StudentService } from '../student/student.service';
 import { HrService } from '../hr/hr.service';
 import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
 import { ChangeStudentStatusGuard } from '../common/guards/change-student-status.guard';
-import { ChangeStatusDto } from '../student/dto/change-status.dto';
+import { ChangeStatusInterviewDto } from '../student/dto/change-status-interview.dto';
 import { OnlyActiveUserGuard } from '../common/guards/only-active-user.guard';
+import { RoleGuard } from '../common/guards/role.guard';
+import { InterviewService } from '../hr/interview.service';
 
 @Controller('/api/user')
 @UseGuards(JwtAuthGuard, OnlyActiveUserGuard)
@@ -24,6 +26,7 @@ export class UserController {
     private userService: UserService,
     private studentService: StudentService,
     private hrService: HrService,
+    private interviewService: InterviewService,
   ) {}
 
   @Get(':id')
@@ -40,16 +43,24 @@ export class UserController {
     return this.studentService.findOne(id);
   }
 
-  @Patch('/:id/student/status')
-  @UseGuards(ChangeStudentStatusGuard)
-  @SetRole('admin')
-  async changeStudentStatus(
-    @Param('id') id: string,
-    @Body() changeStatusDto: ChangeStatusDto,
-  ): Promise<ChangeStudentStatusResponse> {
-    //@TODO usunąć komentarz
-    // return this.studentService.changeStatus(id, changeStatusDto);
-    return '' as any;
+  // @Patch('/:id/student/status')
+  // @UseGuards(ChangeStudentStatusGuard)
+  // @SetRole('admin')
+  // async changeStudentStatus(
+  //   @Param('id') id: string,
+  //   @Body() changeStatusDto: ChangeStatusDto,
+  // ): Promise<ChangeStudentStatusResponse> {
+  //
+  //   // return this.studentService.changeStatus(id, changeStatusDto);
+  //   return '' as any;
+  // }
+
+  //@TODO dodać nowego guarda, sprawdzającego czy kursant nie jest zatrudniony i czy hrId należy do konkretnego hr
+  @Patch('/:id/student/interview')
+  @UseGuards(RoleGuard)
+  @SetRole('admin', 'hr')
+  async createInterview(@Param('id') id: string, @Body() { hrId }: ChangeStatusInterviewDto) {
+    await this.interviewService.createInterview(id, hrId);
   }
 
   @Get('/:id/hr/student')

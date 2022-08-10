@@ -4,5 +4,5 @@ export interface InterviewInterface {
   id: string;
   hr: User;
   student: User;
-  expiredAt: string;
+  expiredAt: Date;
 }
