@@ -42,18 +42,6 @@ export class UserController {
     return this.studentService.findOne(id);
   }
 
-  // @Patch('/:id/student/status')
-  // @UseGuards(ChangeStudentStatusGuard)
-  // @SetRole('admin')
-  // async changeStudentStatus(
-  //   @Param('id') id: string,
-  //   @Body() changeStatusDto: ChangeStatusDto,
-  // ): Promise<ChangeStudentStatusResponse> {
-  //
-  //   // return this.studentService.changeStatus(id, changeStatusDto);
-  //   return '' as any;
-  // }
-
   //@TODO dodać nowego guarda, sprawdzającego czy kursant nie jest zatrudniony i czy hrId należy do konkretnego hr
   @Patch('/:id/student/interview')
   @UseGuards(RoleGuard)
@@ -73,6 +61,13 @@ export class UserController {
     @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
   ) {
     return this.interviewService.removeInterview(id, changeStatusInterviewDto);
+  }
+
+  @Patch('/:id/student/employed')
+  @UseGuards(RoleGuard)
+  @SetRole('admin', 'hr')
+  async changeEmployedStatus(@Param('id') id: string) {
+    return this.studentService.changeEmployedStatus(id);
   }
 
   @Get('/:id/hr/student')

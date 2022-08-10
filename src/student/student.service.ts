@@ -8,7 +8,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {
-  ChangeStudentStatusResponse,
   CompleteStudentResponse,
   ContractType,
   CreateStudentsResponse,
@@ -37,7 +36,6 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
-import { ChangeStatusInterviewDto } from '../hr/dto/change-status-interview.dto';
 import { HrService } from '../hr/hr.service';
 import { AdminService } from '../admin/admin.service';
 
@@ -267,45 +265,20 @@ export class StudentService {
 
   //@TODO stworzyć nowy change status
 
-  // async changeStatus(
-  //   id: string,
-  //   changeStatusDto: ChangeStatusDto,
-  // ): Promise<ChangeStudentStatusResponse> {
-  //   if (!id || (changeStatusDto.status === StudentStatus.AtInterview && !changeStatusDto.hrId)) {
-  //     throw new BadRequestException();
-  //   }
-  //
-  //   const user = await this.getStudent({ id });
-  //   if (!user) throw new NotFoundException();
-  //
-  //   if (changeStatusDto.status === StudentStatus.AtInterview) {
-  //     const hr = await this.hrService.getHr({ id: changeStatusDto.hrId });
-  //     if (!hr) throw new NotFoundException();
-  //
-  //     user.student.status = changeStatusDto.status;
-  //     user.student.interviewWithHr = hr;
-  //     user.student.interviewExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10);
-  //   } else {
-  //     if (changeStatusDto.status === StudentStatus.Employed) {
-  //       await this.notificationService.createNotification(
-  //         `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony przez ${
-  //           user.student.interviewWithHr?.firstName ?? ''
-  //         } ${user.student.interviewWithHr?.lastName ?? ''} (${
-  //           user.student.interviewWithHr?.id ?? 'nieznany'
-  //         })`,
-  //         id,
-  //       );
-  //     }
-  //
-  //     user.student.status = changeStatusDto.status;
-  //     user.student.interviewWithHr = null;
-  //     user.student.interviewExpiredAt = null;
-  //   }
-  //
-  //   await user.student.save();
-  //
-  //   return this.studentHelperService.filterStudent(user);
-  // }
+  async changeEmployedStatus(id: string) {
+    if (!id) throw new BadRequestException();
+
+    const user = await User.findOne({
+      where: { id },
+      relations: ['student'],
+    });
+    if (!user) throw new NotFoundException();
+
+    user.student.status = StudentStatus.Employed;
+    await user.student.save();
+
+    return this.studentHelperService.filterStudent(user);
+  }
 
   async insertUrls(
     urls: string[],
