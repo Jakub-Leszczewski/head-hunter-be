@@ -22,7 +22,7 @@ export class ChangeEmployedStatusGuard implements CanActivate {
 
     if (user.id === ownerId || roles?.includes(user.role)) return true;
     else if (user.role === UserRole.Hr) {
-      const interview = Interview.findOne({
+      const interview = await Interview.findOne({
         where: {
           hr: { id: user.id },
           student: { id: ownerId },

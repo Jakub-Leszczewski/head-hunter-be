@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -92,6 +91,12 @@ export class InterviewService {
       studentId: interview.student.id,
       expiredAt: interview.expiredAt,
     };
+  }
+
+  async removeAllInterviewsByStudentId(id: string) {
+    await Interview.delete({
+      student: { id },
+    });
   }
 
   async checkInterviewExist(studentId: string, hrId: string): Promise<boolean> {

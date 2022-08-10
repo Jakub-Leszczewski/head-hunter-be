@@ -38,6 +38,7 @@ import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { HrService } from '../hr/hr.service';
 import { AdminService } from '../admin/admin.service';
+import { InterviewService } from '../hr/interview.service';
 
 @Injectable()
 export class StudentService {
@@ -47,6 +48,7 @@ export class StudentService {
     @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
     private studentHelperService: StudentHelperService,
     private notificationService: AdminService,
+    private interviewService: InterviewService,
     private mailService: MailService,
   ) {}
 
@@ -263,8 +265,6 @@ export class StudentService {
     return this.insertUrls(urls, student, PortfolioUrl);
   }
 
-  //@TODO stworzyć nowy change status
-
   async changeEmployedStatus(id: string) {
     if (!id) throw new BadRequestException();
 
@@ -276,6 +276,8 @@ export class StudentService {
 
     user.student.status = StudentStatus.Employed;
     await user.student.save();
+
+    await this.interviewService.removeAllInterviewsByStudentId(id);
 
     return this.studentHelperService.filterStudent(user);
   }
