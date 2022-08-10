@@ -13,7 +13,7 @@ import { UpdateStudentDto } from '../student/dto/update-student.dto';
 import { StudentService } from '../student/student.service';
 import { HrService } from '../hr/hr.service';
 import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
-import { ChangeStudentStatusGuard } from '../common/guards/change-student-status.guard';
+import { ChangeEmployedStatusGuard } from '../common/guards/change-employed-status.guard';
 import { ChangeStatusInterviewDto } from '../hr/dto/change-status-interview.dto';
 import { OnlyActiveUserGuard } from '../common/guards/only-active-user.guard';
 import { RoleGuard } from '../common/guards/role.guard';
@@ -82,8 +82,8 @@ export class UserController {
   }
 
   @Patch('/:id/student/employed')
-  @UseGuards(RoleGuard)
-  @SetRole('admin', 'hr')
+  @UseGuards(ChangeEmployedStatusGuard)
+  @SetRole('admin')
   async changeEmployedStatus(@Param('id') id: string) {
     return this.studentService.changeEmployedStatus(id);
   }
