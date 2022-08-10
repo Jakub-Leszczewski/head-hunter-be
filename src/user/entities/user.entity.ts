@@ -77,9 +77,6 @@ export class User extends BaseEntity implements UserInterface {
   @Column()
   public jwtId: string;
 
-  @OneToMany((type) => Student, (student) => student.interviewWithHr)
-  public studentsAtInterview: Student[];
-
   @OneToOne((type) => Student, (student) => student.user, {
     onDelete: 'CASCADE',
   })

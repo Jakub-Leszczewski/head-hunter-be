@@ -265,45 +265,47 @@ export class StudentService {
     return this.insertUrls(urls, student, PortfolioUrl);
   }
 
-  async changeStatus(
-    id: string,
-    changeStatusDto: ChangeStatusDto,
-  ): Promise<ChangeStudentStatusResponse> {
-    if (!id || (changeStatusDto.status === StudentStatus.AtInterview && !changeStatusDto.hrId)) {
-      throw new BadRequestException();
-    }
+  //@TODO stworzyć nowy change status
 
-    const user = await this.getStudent({ id });
-    if (!user) throw new NotFoundException();
-
-    if (changeStatusDto.status === StudentStatus.AtInterview) {
-      const hr = await this.hrService.getHr({ id: changeStatusDto.hrId });
-      if (!hr) throw new NotFoundException();
-
-      user.student.status = changeStatusDto.status;
-      user.student.interviewWithHr = hr;
-      user.student.interviewExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10);
-    } else {
-      if (changeStatusDto.status === StudentStatus.Employed) {
-        await this.notificationService.createNotification(
-          `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony przez ${
-            user.student.interviewWithHr?.firstName ?? ''
-          } ${user.student.interviewWithHr?.lastName ?? ''} (${
-            user.student.interviewWithHr?.id ?? 'nieznany'
-          })`,
-          id,
-        );
-      }
-
-      user.student.status = changeStatusDto.status;
-      user.student.interviewWithHr = null;
-      user.student.interviewExpiredAt = null;
-    }
-
-    await user.student.save();
-
-    return this.studentHelperService.filterStudent(user);
-  }
+  // async changeStatus(
+  //   id: string,
+  //   changeStatusDto: ChangeStatusDto,
+  // ): Promise<ChangeStudentStatusResponse> {
+  //   if (!id || (changeStatusDto.status === StudentStatus.AtInterview && !changeStatusDto.hrId)) {
+  //     throw new BadRequestException();
+  //   }
+  //
+  //   const user = await this.getStudent({ id });
+  //   if (!user) throw new NotFoundException();
+  //
+  //   if (changeStatusDto.status === StudentStatus.AtInterview) {
+  //     const hr = await this.hrService.getHr({ id: changeStatusDto.hrId });
+  //     if (!hr) throw new NotFoundException();
+  //
+  //     user.student.status = changeStatusDto.status;
+  //     user.student.interviewWithHr = hr;
+  //     user.student.interviewExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10);
+  //   } else {
+  //     if (changeStatusDto.status === StudentStatus.Employed) {
+  //       await this.notificationService.createNotification(
+  //         `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony przez ${
+  //           user.student.interviewWithHr?.firstName ?? ''
+  //         } ${user.student.interviewWithHr?.lastName ?? ''} (${
+  //           user.student.interviewWithHr?.id ?? 'nieznany'
+  //         })`,
+  //         id,
+  //       );
+  //     }
+  //
+  //     user.student.status = changeStatusDto.status;
+  //     user.student.interviewWithHr = null;
+  //     user.student.interviewExpiredAt = null;
+  //   }
+  //
+  //   await user.student.save();
+  //
+  //   return this.studentHelperService.filterStudent(user);
+  // }
 
   async insertUrls(
     urls: string[],

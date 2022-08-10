@@ -41,16 +41,7 @@ export class StudentHelperService {
 
   filterStudent(userEntity: User): StudentResponse {
     const { hr, student, ...userResponse } = this.userHelperService.filter(userEntity);
-    const {
-      bonusProjectUrls,
-      portfolioUrls,
-      projectUrls,
-      user,
-      id,
-      interviewWithHr,
-      interviewExpiredAt,
-      ...studentResponse
-    } = student;
+    const { bonusProjectUrls, portfolioUrls, projectUrls, user, id, ...studentResponse } = student;
 
     const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
     const newPortfolioUrls = this.filterUrl(portfolioUrls);
@@ -80,8 +71,6 @@ export class StudentHelperService {
       education,
       courses,
       workExperience,
-      interviewWithHr,
-      interviewExpiredAt,
       ...studentResponse
     } = student;
 

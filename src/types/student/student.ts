@@ -7,7 +7,6 @@ import { WorkType } from './work-type';
 export interface StudentInterface {
   id: string;
   status: StudentStatus;
-  interviewWithHr: UserInterface;
   courseCompletion: number;
   courseEngagement: number;
   projectDegree: number;
@@ -24,7 +23,6 @@ export interface StudentInterface {
   expectedContractType: ContractType;
   expectedTypeWork: WorkType;
   canTakeApprenticeship: boolean;
-  interviewExpiredAt: Date | null;
   bonusProjectUrls: UrlInterface[];
   projectUrls: UrlInterface[];
   portfolioUrls: UrlInterface[];
@@ -42,19 +40,11 @@ export type StudentSmallResponseData = Omit<
   | 'education'
   | 'courses'
   | 'workExperience'
-  | 'interviewWithHr'
-  | 'interviewExpiredAt'
 >;
 
 export type StudentResponseData = Omit<
   StudentInterface,
-  | 'id'
-  | 'bonusProjectUrls'
-  | 'projectUrls'
-  | 'portfolioUrls'
-  | 'user'
-  | 'interviewWithHr'
-  | 'interviewExpiredAt'
+  'id' | 'bonusProjectUrls' | 'projectUrls' | 'portfolioUrls' | 'user'
 > & {
   bonusProjectUrls: UrlResponseData[];
   projectUrls: UrlResponseData[];

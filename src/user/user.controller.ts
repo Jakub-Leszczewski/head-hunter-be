@@ -47,7 +47,9 @@ export class UserController {
     @Param('id') id: string,
     @Body() changeStatusDto: ChangeStatusDto,
   ): Promise<ChangeStudentStatusResponse> {
-    return this.studentService.changeStatus(id, changeStatusDto);
+    //@TODO usunąć komentarz
+    // return this.studentService.changeStatus(id, changeStatusDto);
+    return '' as any;
   }
 
   @Get('/:id/hr/student')

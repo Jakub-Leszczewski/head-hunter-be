@@ -40,15 +40,16 @@ export class ChangeStudentStatusGuard implements CanActivate {
     if (!userStudent.student) throw new Error(`Student is undefined in user: ${userStudent.id}`);
 
     const { student } = userStudent;
-
-    return (
-      roles?.includes(user.role) ||
-      (body.status === StudentStatus.Employed && ownerId === user.id) ||
-      (student.status === StudentStatus.AtInterview && student.interviewWithHr.id === user.id) ||
-      (student.status === StudentStatus.Available &&
-        body.status === StudentStatus.AtInterview &&
-        user.role === UserRole.Hr &&
-        body.hrId === user.id)
-    );
+    //@TODO zaktualizować guarda
+    return true;
+    // return (
+    //   roles?.includes(user.role) ||
+    //   (body.status === StudentStatus.Employed && ownerId === user.id) ||
+    //   (student.status === StudentStatus.AtInterview && student.interviewWithHr.id === user.id) ||
+    //   (student.status === StudentStatus.Available &&
+    //     body.status === StudentStatus.AtInterview &&
+    //     user.role === UserRole.Hr &&
+    //     body.hrId === user.id)
+    // );
   }
 }
