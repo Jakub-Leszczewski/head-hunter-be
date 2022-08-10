@@ -17,11 +17,7 @@ export class FindAllQueryDto implements FindAllQueryDtoInterface {
 
   @IsEnumArray(StudentStatus)
   @IsOptional()
-  public status: StudentStatus[] = [
-    StudentStatus.Available,
-    StudentStatus.AtInterview,
-    StudentStatus.Employed,
-  ];
+  public status: StudentStatus[] = [StudentStatus.Available, StudentStatus.Employed];
 
   @IsEnum(SortBy)
   @IsOptional()

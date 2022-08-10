@@ -43,7 +43,7 @@ export class HrService {
 
     const [result, totalEntitiesCount] = await this.studentHelperService
       .findAllStudentsQb(
-        this.studentHelperService.statusStudentQbCondition([StudentStatus.AtInterview]),
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.Available]),
         this.studentHelperService.filterStudentQbCondition(query),
         this.studentHelperService.searchStudentByNameQbCondition(search),
         this.studentHelperService.interviewWithHrStudentQbCondition(id),
