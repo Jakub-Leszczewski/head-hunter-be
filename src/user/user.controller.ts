@@ -18,6 +18,7 @@ import { ChangeStatusInterviewDto } from '../hr/dto/change-status-interview.dto'
 import { OnlyActiveUserGuard } from '../common/guards/only-active-user.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { InterviewService } from '../hr/interview.service';
+import { ChangeInterviewGuard } from '../common/guards/change-interview.guard';
 
 @Controller('/api/user')
 @UseGuards(JwtAuthGuard, OnlyActiveUserGuard)
@@ -42,34 +43,6 @@ export class UserController {
     return this.studentService.findOne(id);
   }
 
-  //@TODO dodać nowego guarda, sprawdzającego czy kursant nie jest zatrudniony i czy hrId należy do konkretnego hr
-  @Patch('/:id/student/interview')
-  @UseGuards(RoleGuard)
-  @SetRole('admin', 'hr')
-  async createInterview(
-    @Param('id') id: string,
-    @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
-  ) {
-    return this.interviewService.createInterview(id, changeStatusInterviewDto);
-  }
-
-  @Delete('/:id/student/interview')
-  @UseGuards(RoleGuard)
-  @SetRole('admin', 'hr')
-  async removeInterview(
-    @Param('id') id: string,
-    @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
-  ) {
-    return this.interviewService.removeInterview(id, changeStatusInterviewDto);
-  }
-
-  @Patch('/:id/student/employed')
-  @UseGuards(RoleGuard)
-  @SetRole('admin', 'hr')
-  async changeEmployedStatus(@Param('id') id: string) {
-    return this.studentService.changeEmployedStatus(id);
-  }
-
   @Get('/:id/hr/student')
   @UseGuards(UserOwnerGuard)
   @SetRole('admin')
@@ -85,5 +58,32 @@ export class UserController {
   @UseGuards(UserOwnerGuard)
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(id, updateStudentDto);
+  }
+
+  @Patch('/:id/student/interview')
+  @UseGuards(ChangeInterviewGuard)
+  @SetRole('admin')
+  async createInterview(
+    @Param('id') id: string,
+    @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
+  ) {
+    return this.interviewService.createInterview(id, changeStatusInterviewDto);
+  }
+
+  @Delete('/:id/student/interview')
+  @UseGuards(ChangeInterviewGuard)
+  @SetRole('admin')
+  async removeInterview(
+    @Param('id') id: string,
+    @Body() changeStatusInterviewDto: ChangeStatusInterviewDto,
+  ) {
+    return this.interviewService.removeInterview(id, changeStatusInterviewDto);
+  }
+
+  @Patch('/:id/student/employed')
+  @UseGuards(RoleGuard)
+  @SetRole('admin', 'hr')
+  async changeEmployedStatus(@Param('id') id: string) {
+    return this.studentService.changeEmployedStatus(id);
   }
 }
