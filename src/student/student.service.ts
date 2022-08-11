@@ -38,7 +38,7 @@ import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { HrService } from '../hr/hr.service';
-import { AdminService } from '../admin/admin.service';
+import { NotificationService } from '../admin/notification.service';
 import { InterviewService } from '../hr/interview.service';
 
 @Injectable()
@@ -48,7 +48,7 @@ export class StudentService {
     @Inject(forwardRef(() => HrService)) private hrService: HrService,
     @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
     @Inject(StudentHelperService) private studentHelperService: StudentHelperService,
-    @Inject(AdminService) private notificationService: AdminService,
+    @Inject(NotificationService) private notificationService: NotificationService,
     @Inject(InterviewService) private interviewService: InterviewService,
     @Inject(MailService) private mailService: MailService,
   ) {}
@@ -76,13 +76,7 @@ export class StudentService {
   async findOne(id: string): Promise<GetStudentResponse> {
     if (!id) throw new BadRequestException();
 
-    const user = await User.findOne({
-      where: {
-        id,
-        role: UserRole.Student,
-      },
-      relations: ['student'],
-    });
+    const user = await this.getStudent({ id });
 
     if (!user) throw new NotFoundException();
 
@@ -129,7 +123,7 @@ export class StudentService {
         await student.save();
 
         await this.mailService.sendStudentSignupEmail(user.email, {
-          signupUrl: `${config.feUrl}/signup/student/${user.id}/${user.userToken}`,
+          signupUrl: `${config.feUrl}/signup/student/${user.userToken}`,
           courseCompletion: student.courseCompletion,
           courseEngagement: student.courseEngagement,
           projectDegree: student.projectDegree,
@@ -308,13 +302,15 @@ export class StudentService {
 
   async getStudent(where: { [key: string]: any }): Promise<User> {
     return User.findOne({
-      where,
+      where: {
+        ...where,
+        role: UserRole.Student,
+      },
       relations: [
         'student',
         'student.bonusProjectUrls',
         'student.portfolioUrls',
         'student.projectUrls',
-        'student.interviewWithHr',
       ],
     });
   }
