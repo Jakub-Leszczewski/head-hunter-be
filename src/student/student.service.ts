@@ -279,6 +279,10 @@ export class StudentService {
     await user.student.save();
 
     await this.interviewService.removeAllInterviewsByStudentId(id);
+    await this.notificationService.createNotification(
+      `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony`,
+      id,
+    );
 
     return this.studentHelperService.filterStudent(user);
   }
