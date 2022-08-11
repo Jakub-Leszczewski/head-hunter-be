@@ -1,8 +1,8 @@
-import { User } from '../../user/entities/user.entity';
+import { UserInterface } from '../user';
 
 export interface InterviewInterface {
   id: string;
-  hr: User;
-  student: User;
+  hr: UserInterface;
+  student: UserInterface;
   expiredAt: Date;
 }
