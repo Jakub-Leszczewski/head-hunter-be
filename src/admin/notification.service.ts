@@ -8,7 +8,7 @@ import { NotificationResponse } from '../types';
 import { GetNotificationsResponse } from '../types/admin/notification-response';
 
 @Injectable()
-export class AdminService {
+export class NotificationService {
   constructor(@Inject(DataSource) private dataSource: DataSource) {}
 
   async findAllNotifications(

@@ -64,7 +64,7 @@ export class HrService {
     await hr.save();
 
     await this.mailService.sendHrSignupEmail(user.email, {
-      signupUrl: `${config.feUrl}/signup/hr/${user.id}/${user.userToken}`,
+      signupUrl: `${config.feUrl}/signup/hr/${user.userToken}`,
     });
 
     return this.hrHelperService.filterHr(user);
