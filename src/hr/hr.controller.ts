@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, UseGuards, Inject } from '@nestjs/common';
 import { HrService } from './hr.service';
 import { CreateHrDto } from './dto/create-hr.dto';
 import { CompletionHrDto } from './dto/completion-hr.dto';
@@ -8,13 +8,13 @@ import { RoleGuard } from '../common/guards/role.guard';
 import { UserOwnerGuard } from '../common/guards/user-owner.guard';
 import { CompletionSignupHrResponse } from '../types';
 
-@Controller('/api/hr')
+@Controller('/hr')
 export class HrController {
-  constructor(private readonly hrService: HrService) {}
+  constructor(@Inject(HrService) private hrService: HrService) {}
 
   @Post('/')
-  // @SetRole('admin')
-  // @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   async importHr(@Body() createHrDto: CreateHrDto) {
     return this.hrService.importHr(createHrDto);
   }

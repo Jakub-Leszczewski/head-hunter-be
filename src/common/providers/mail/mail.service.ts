@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { MailerService } from '@nest-modules/mailer';
 
 interface StudentSignupContext {
@@ -19,7 +19,7 @@ interface ForgotPasswordContext {
 
 @Injectable()
 export class MailService {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(@Inject(MailerService) private mailerService: MailerService) {}
 
   async sendStudentSignupEmail(to: string, context: StudentSignupContext): Promise<void> {
     await this.mailerService.sendMail({

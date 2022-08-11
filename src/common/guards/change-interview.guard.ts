@@ -1,4 +1,10 @@
-import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { User } from '../../user/entities/user.entity';
@@ -8,7 +14,10 @@ import { ChangeStatusInterviewDto } from '../../hr/dto/change-status-interview.d
 
 @Injectable()
 export class ChangeInterviewGuard implements CanActivate {
-  constructor(private reflector: Reflector, private dataSource: DataSource) {}
+  constructor(
+    @Inject(Reflector) private reflector: Reflector,
+    @Inject(DataSource) private dataSource: DataSource,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();

@@ -12,11 +12,15 @@ export class Interview extends BaseEntity implements InterviewInterface {
   })
   public expiredAt: Date;
 
-  @ManyToOne((type) => User, (user) => user.hrInterview)
+  @ManyToOne((type) => User, (user) => user.hrInterview, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   public hr: User;
 
-  @ManyToOne((type) => User, (user) => user.studentAtInterview)
+  @ManyToOne((type) => User, (user) => user.studentAtInterview, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   public student: User;
 }

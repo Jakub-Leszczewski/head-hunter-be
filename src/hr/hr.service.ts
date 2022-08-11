@@ -35,12 +35,8 @@ export class HrService {
     @Inject(forwardRef(() => HrHelperService)) private hrHelperService: HrHelperService,
     @Inject(forwardRef(() => StudentHelperService))
     private studentHelperService: StudentHelperService,
-    private mailService: MailService,
+    @Inject(MailService) private mailService: MailService,
   ) {}
-
-  // async findStudentsAtInterview(id: string, query: FindAllQueryDto): Promise<GetStudentsResponse> {
-  //
-  // }
 
   async importHr(createHrDto: CreateHrDto): Promise<CreateHrResponse> {
     await this.userHelperService.checkUserFieldUniquenessAndThrow({

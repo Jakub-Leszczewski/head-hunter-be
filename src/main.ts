@@ -25,6 +25,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
+  app.setGlobalPrefix('api');
 
   await app.listen(3001);
 }

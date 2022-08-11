@@ -1,4 +1,14 @@
-import { Controller, Get, Param, UseGuards, Patch, Body, Query, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  Patch,
+  Body,
+  Query,
+  Delete,
+  Inject,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   GetUserResponse,
@@ -22,16 +32,16 @@ import { ChangeInterviewGuard } from '../common/guards/change-interview.guard';
 import { HrMaxInterviewGuard } from '../common/guards/hr-max-interview.guard';
 import { StudentNotEmployedGuard } from '../common/guards/student-not-employed.guard';
 
-@Controller('/api/user')
+@Controller('/user')
 @UseGuards(JwtAuthGuard, OnlyActiveUserGuard)
 export class UserController {
   constructor(
-    private userService: UserService,
-    private studentService: StudentService,
-    private interviewService: InterviewService,
+    @Inject(UserService) private userService: UserService,
+    @Inject(StudentService) private studentService: StudentService,
+    @Inject(InterviewService) private interviewService: InterviewService,
   ) {}
 
-  @Get(':id')
+  @Get('/:id')
   @UseGuards(UserOwnerGuard)
   @SetRole('admin')
   async findOne(@Param('id') id: string): Promise<GetUserResponse> {

@@ -8,6 +8,7 @@ import {
   UseGuards,
   Get,
   Query,
+  Inject,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { ImportStudentDto } from './dto/import-student.dto';
@@ -19,9 +20,9 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 
-@Controller('/api/student')
+@Controller('/student')
 export class StudentController {
-  constructor(private studentService: StudentService) {}
+  constructor(@Inject(StudentService) private studentService: StudentService) {}
 
   @Get('/')
   @UseGuards(JwtAuthGuard, RoleGuard)

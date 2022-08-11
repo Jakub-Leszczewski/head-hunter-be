@@ -47,10 +47,10 @@ export class StudentService {
     @Inject(forwardRef(() => UserService)) private userService: UserService,
     @Inject(forwardRef(() => HrService)) private hrService: HrService,
     @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
-    private studentHelperService: StudentHelperService,
-    private notificationService: AdminService,
-    private interviewService: InterviewService,
-    private mailService: MailService,
+    @Inject(StudentHelperService) private studentHelperService: StudentHelperService,
+    @Inject(AdminService) private notificationService: AdminService,
+    @Inject(InterviewService) private interviewService: InterviewService,
+    @Inject(MailService) private mailService: MailService,
   ) {}
 
   async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {

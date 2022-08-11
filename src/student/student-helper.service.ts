@@ -21,7 +21,7 @@ import { Brackets, DataSource, SelectQueryBuilder } from 'typeorm';
 export class StudentHelperService {
   constructor(
     @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
-    private dataSource: DataSource,
+    @Inject(DataSource) private dataSource: DataSource,
   ) {}
 
   async checkGithubExist(username: string) {

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,7 +20,7 @@ import { ChangeStatusInterviewDto } from './dto/change-status-interview.dto';
 
 @Injectable()
 export class InterviewService {
-  constructor(private studentHelperService: StudentHelperService) {}
+  constructor(@Inject(StudentHelperService) private studentHelperService: StudentHelperService) {}
 
   async findAllHrInterview(id: string, query): Promise<GetStudentsResponse> {
     const { search, sortBy, sortMethod, page } = query;
