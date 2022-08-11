@@ -56,6 +56,6 @@ export interface FindAllQueryFilter {
   monthsOfCommercialExp: number;
 }
 
-export interface ChangeStatusDtoInterface {
-  status: StudentStatus;
+export interface ChangeStatusInterviewDtoInterface {
+  hrId: string;
 }

@@ -35,29 +35,8 @@ export class HrService {
     @Inject(forwardRef(() => HrHelperService)) private hrHelperService: HrHelperService,
     @Inject(forwardRef(() => StudentHelperService))
     private studentHelperService: StudentHelperService,
-    private mailService: MailService,
+    @Inject(MailService) private mailService: MailService,
   ) {}
-
-  async findStudentsAtInterview(id: string, query: FindAllQueryDto): Promise<GetStudentsResponse> {
-    const { search, sortBy, sortMethod, page } = query;
-
-    const [result, totalEntitiesCount] = await this.studentHelperService
-      .findAllStudentsQb(
-        this.studentHelperService.statusStudentQbCondition([StudentStatus.AtInterview]),
-        this.studentHelperService.filterStudentQbCondition(query),
-        this.studentHelperService.searchStudentByNameQbCondition(search),
-        this.studentHelperService.interviewWithHrStudentQbCondition(id),
-        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
-        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
-      )
-      .getManyAndCount();
-
-    return {
-      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
-      totalEntitiesCount,
-      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
-    };
-  }
 
   async importHr(createHrDto: CreateHrDto): Promise<CreateHrResponse> {
     await this.userHelperService.checkUserFieldUniquenessAndThrow({

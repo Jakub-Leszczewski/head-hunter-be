@@ -12,6 +12,7 @@ import { UserInterface, UserRole } from '../../types';
 import { Student } from '../../student/entities/student.entity';
 import { Hr } from '../../hr/entities/hr.entity';
 import { Notification } from '../../admin/entities/notification.entity';
+import { Interview } from '../../hr/entities/interview.entity';
 
 @Entity()
 export class User extends BaseEntity implements UserInterface {
@@ -77,9 +78,6 @@ export class User extends BaseEntity implements UserInterface {
   @Column()
   public jwtId: string;
 
-  @OneToMany((type) => Student, (student) => student.interviewWithHr)
-  public studentsAtInterview: Student[];
-
   @OneToOne((type) => Student, (student) => student.user, {
     onDelete: 'CASCADE',
   })
@@ -94,4 +92,10 @@ export class User extends BaseEntity implements UserInterface {
 
   @OneToMany((type) => Notification, (notification) => notification.user)
   public notifications: Notification[];
+
+  @OneToMany((type) => Interview, (interview) => interview.student)
+  public studentAtInterview: Interview[];
+
+  @OneToMany((type) => Interview, (interview) => interview.hr)
+  public hrInterview: Interview[];
 }

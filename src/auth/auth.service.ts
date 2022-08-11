@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -26,9 +27,9 @@ import { hashPwd } from '../common/utils/hashPwd';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly userHelperService: UserHelperService,
-    private readonly mailService: MailService,
+    @Inject(JwtService) private jwtService: JwtService,
+    @Inject(UserHelperService) private userHelperService: UserHelperService,
+    @Inject(MailService) private mailService: MailService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<User | null> {

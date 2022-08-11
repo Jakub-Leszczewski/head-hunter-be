@@ -21,7 +21,7 @@ import { Brackets, DataSource, SelectQueryBuilder } from 'typeorm';
 export class StudentHelperService {
   constructor(
     @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
-    private dataSource: DataSource,
+    @Inject(DataSource) private dataSource: DataSource,
   ) {}
 
   async checkGithubExist(username: string) {
@@ -41,16 +41,7 @@ export class StudentHelperService {
 
   filterStudent(userEntity: User): StudentResponse {
     const { hr, student, ...userResponse } = this.userHelperService.filter(userEntity);
-    const {
-      bonusProjectUrls,
-      portfolioUrls,
-      projectUrls,
-      user,
-      id,
-      interviewWithHr,
-      interviewExpiredAt,
-      ...studentResponse
-    } = student;
+    const { bonusProjectUrls, portfolioUrls, projectUrls, user, id, ...studentResponse } = student;
 
     const newBonusProjectUrls = this.filterUrl(bonusProjectUrls);
     const newPortfolioUrls = this.filterUrl(portfolioUrls);
@@ -80,8 +71,6 @@ export class StudentHelperService {
       education,
       courses,
       workExperience,
-      interviewWithHr,
-      interviewExpiredAt,
       ...studentResponse
     } = student;
 
@@ -128,8 +117,9 @@ export class StudentHelperService {
         'student.canTakeApprenticeship',
       ])
       .from(User, 'user')
+      .leftJoin('user.studentAtInterview', 'studentAtInterview')
+      .leftJoin('studentAtInterview.hr', 'studentInterview')
       .leftJoin('user.student', 'student')
-      .leftJoin('student.interviewWithHr', 'interviewWithHr')
       .where('user.role=:role', { role: UserRole.Student })
       .andWhere('user.isActive=:isActive', { isActive: true });
 
@@ -213,6 +203,6 @@ export class StudentHelperService {
   }
 
   interviewWithHrStudentQbCondition(hrId: string) {
-    return (qb: SelectQueryBuilder<User>) => qb.andWhere('interviewWithHr.id=:hrId', { hrId });
+    return (qb: SelectQueryBuilder<User>) => qb.andWhere('studentInterview.id=:hrId', { hrId });
   }
 }

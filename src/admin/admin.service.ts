@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
 import { Notification } from './entities/notification.entity';
 import { FindAllNotificationQueryDto } from './dto/find-all-notification-query.dto';
-import { Brackets, DataSource } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { config } from '../config/config';
 import { NotificationResponse } from '../types';
 import { GetNotificationsResponse } from '../types/admin/notification-response';
 
 @Injectable()
 export class AdminService {
-  constructor(private dataSource: DataSource) {}
+  constructor(@Inject(DataSource) private dataSource: DataSource) {}
 
   async findAllNotifications(
     query: FindAllNotificationQueryDto,

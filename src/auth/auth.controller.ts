@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Inject,
   Param,
   Post,
   Put,
@@ -27,9 +28,12 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
 import { UserHelperService } from '../user/user-helper.service';
 
-@Controller('/api/auth')
+@Controller('/auth')
 export class AuthController {
-  constructor(private authService: AuthService, private userHelperService: UserHelperService) {}
+  constructor(
+    @Inject(AuthService) private authService: AuthService,
+    @Inject(UserHelperService) private userHelperService: UserHelperService,
+  ) {}
 
   @Get('/user')
   @UseGuards(JwtAuthGuard)

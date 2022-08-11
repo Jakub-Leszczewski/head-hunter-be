@@ -1,16 +1,11 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UserHelperService } from './user-helper.service';
-import { GetUserResponse } from '../types/user/user-response';
+import { GetUserResponse } from '../types';
 
 @Injectable()
 export class UserService {
-  constructor(private userHelperService: UserHelperService) {}
+  constructor(@Inject(UserHelperService) private userHelperService: UserHelperService) {}
 
   async findOne(id: string): Promise<GetUserResponse> {
     if (!id) throw new BadRequestException();

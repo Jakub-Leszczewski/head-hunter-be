@@ -142,19 +142,6 @@ export class Student extends BaseEntity implements StudentInterface {
   })
   public canTakeApprenticeship: boolean;
 
-  @Column({
-    type: 'datetime',
-    default: null,
-    nullable: true,
-  })
-  public interviewExpiredAt: Date;
-
-  @ManyToOne((type) => User, (hr) => hr.studentsAtInterview, {
-    onDelete: 'SET NULL',
-  })
-  @JoinColumn()
-  public interviewWithHr: User;
-
   @OneToMany((type) => BonusProjectUrl, (bonusProjectUrls) => bonusProjectUrls.student)
   public bonusProjectUrls: BonusProjectUrl[];
 

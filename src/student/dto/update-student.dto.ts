@@ -17,6 +17,7 @@ import {
   Min,
 } from 'class-validator';
 import { IsNotNull } from '../../common/decorators/validation';
+import { PASSWORD_REGEX } from '../../common/constants/constant';
 
 export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   @IsString()
@@ -39,7 +40,7 @@ export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
 
   @IsString()
   @Length(8, 36)
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/)
+  @Matches(PASSWORD_REGEX)
   public newPassword: string;
 
   @IsString()
