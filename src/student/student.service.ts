@@ -54,11 +54,11 @@ export class StudentService {
   ) {}
 
   async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {
-    const { search, sortBy, sortMethod, page, status } = query;
+    const { search, sortBy, sortMethod, page } = query;
 
     const [result, totalEntitiesCount] = await this.studentHelperService
       .findAllStudentsQb(
-        this.studentHelperService.statusStudentQbCondition(status),
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.Available]),
         this.studentHelperService.filterStudentQbCondition(query),
         this.studentHelperService.searchStudentQbCondition(search),
         this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
