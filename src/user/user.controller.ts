@@ -33,7 +33,6 @@ import { HrMaxInterviewGuard } from '../common/guards/hr-max-interview.guard';
 import { StudentNotEmployedGuard } from '../common/guards/student-not-employed.guard';
 
 @Controller('/user')
-@UseGuards(JwtAuthGuard, OnlyActiveUserGuard)
 export class UserController {
   constructor(
     @Inject(UserService) private userService: UserService,
@@ -42,21 +41,21 @@ export class UserController {
   ) {}
 
   @Get('/:id')
-  @UseGuards(UserOwnerGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, UserOwnerGuard)
   @SetRole('admin')
   async findOne(@Param('id') id: string): Promise<GetUserResponse> {
     return this.userService.findOne(id);
   }
 
   @Get('/:id/student')
-  @UseGuards(UserOwnerGuard, StudentNotEmployedGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, UserOwnerGuard, StudentNotEmployedGuard)
   @SetRole('admin', 'hr')
   async findOneStudent(@Param('id') id: string): Promise<GetStudentResponse> {
     return this.studentService.findOne(id);
   }
 
   @Get('/:id/hr/student')
-  @UseGuards(UserOwnerGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, UserOwnerGuard)
   @SetRole('admin')
   async findStudentsAtInterview(
     @Param('id') id: string,
@@ -67,13 +66,19 @@ export class UserController {
 
   @Patch('/:id/student')
   @SetRole('admin')
-  @UseGuards(UserOwnerGuard, StudentNotEmployedGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, UserOwnerGuard, StudentNotEmployedGuard)
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(id, updateStudentDto);
   }
 
   @Patch('/:id/student/interview')
-  @UseGuards(ChangeInterviewGuard, HrMaxInterviewGuard, StudentNotEmployedGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    OnlyActiveUserGuard,
+    ChangeInterviewGuard,
+    HrMaxInterviewGuard,
+    StudentNotEmployedGuard,
+  )
   @SetRole('admin')
   async createInterview(
     @Param('id') id: string,
@@ -83,7 +88,7 @@ export class UserController {
   }
 
   @Delete('/:id/student/interview')
-  @UseGuards(ChangeInterviewGuard, StudentNotEmployedGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, ChangeInterviewGuard, StudentNotEmployedGuard)
   @SetRole('admin')
   async removeInterview(
     @Param('id') id: string,
@@ -93,7 +98,7 @@ export class UserController {
   }
 
   @Patch('/:id/student/employed')
-  @UseGuards(ChangeEmployedStatusGuard, StudentNotEmployedGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, ChangeEmployedStatusGuard, StudentNotEmployedGuard)
   @SetRole('admin')
   async changeEmployedStatus(
     @Param('id') id: string,

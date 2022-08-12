@@ -4,13 +4,14 @@ import { RoleGuard } from '../common/guards/role.guard';
 import { SetRole } from '../common/decorators/set-role';
 import { FindAllNotificationQueryDto } from './dto/find-all-notification-query.dto';
 import { GetNotificationsResponse } from '../types/admin/notification-response';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @Controller('/admin')
 export class AdminController {
   constructor(@Inject(AdminService) private notificationService: AdminService) {}
 
   @Get('/notification')
-  @UseGuards(RoleGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @SetRole('admin')
   async findAllNotifications(
     @Query() query: FindAllNotificationQueryDto,
