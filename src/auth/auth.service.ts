@@ -23,12 +23,14 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailService } from '../common/providers/mail/mail.service';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
 import { hashPwd } from '../common/utils/hashPwd';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(JwtService) private jwtService: JwtService,
     @Inject(UserHelperService) private userHelperService: UserHelperService,
+    @Inject(UserService) private userService: UserService,
     @Inject(MailService) private mailService: MailService,
   ) {}
 
@@ -63,7 +65,7 @@ export class AuthService {
       maxAge: config.jwtCookieTimeToExpire,
     });
 
-    return this.userHelperService.filterUserByRole(user);
+    return this.userService.findOne(user.id);
   }
 
   async logout(user: User, res: Response): Promise<LogoutResponse> {
