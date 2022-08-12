@@ -12,20 +12,13 @@ import { UserService } from '../user/user.service';
 import { UserHelperService } from '../user/user-helper.service';
 import { Hr } from './entities/hr.entity';
 import { User } from '../user/entities/user.entity';
-import {
-  CompletionSignupHrResponse,
-  CreateHrResponse,
-  GetStudentsResponse,
-  StudentStatus,
-  UserRole,
-} from '../types';
+import { CompletionSignupHrResponse, CreateHrResponse, UserInterface, UserRole } from '../types';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
 import { HrHelperService } from './hr-helper.service';
 import { hashPwd } from '../common/utils/hashPwd';
 import { StudentHelperService } from '../student/student-helper.service';
-import { FindAllQueryDto } from '../student/dto/find-all-query.dto';
 
 @Injectable()
 export class HrService {
@@ -90,9 +83,12 @@ export class HrService {
     return this.hrHelperService.filterHr(user);
   }
 
-  async getHr(where: { [key: string]: any }): Promise<User> {
+  async getHr(where: Partial<UserInterface>): Promise<User> {
     return User.findOne({
-      where,
+      where: {
+        ...where,
+        role: UserRole.Student,
+      },
       relations: ['hr'],
     });
   }

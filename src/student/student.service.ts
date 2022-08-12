@@ -16,6 +16,7 @@ import {
   GetStudentsResponse,
   StudentStatus,
   UpdateStudentResponse,
+  UserInterface,
   UserRole,
   WorkType,
 } from '../types';
@@ -300,7 +301,7 @@ export class StudentService {
     );
   }
 
-  async getStudent(where: { [key: string]: any }): Promise<User> {
+  async getStudent(where: Partial<UserInterface>): Promise<User> {
     return User.findOne({
       where: {
         ...where,

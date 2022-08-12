@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UserHelperService } from './user-helper.service';
-import { ChangePasswordResponse, GetUserResponse } from '../types';
+import { ChangePasswordResponse, GetUserResponse, UserInterface, UserRole } from '../types';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { compare } from 'bcrypt';
 import { hashPwd } from '../common/utils/hashPwd';
@@ -19,16 +19,7 @@ export class UserService {
   async findOne(id: string): Promise<GetUserResponse> {
     if (!id) throw new BadRequestException();
 
-    const user = await User.findOne({
-      where: { id },
-      relations: [
-        'hr',
-        'student',
-        'student.bonusProjectUrls',
-        'student.portfolioUrls',
-        'student.projectUrls',
-      ],
-    });
+    const user = await this.getUser({ id });
     if (!user) throw new NotFoundException();
 
     return this.userHelperService.filterUserByRole(user);
@@ -54,5 +45,18 @@ export class UserService {
     } else throw new UnauthorizedException();
 
     return { ok: true };
+  }
+
+  async getUser(where: Partial<UserInterface>): Promise<User> {
+    return User.findOne({
+      where,
+      relations: [
+        'hr',
+        'student',
+        'student.bonusProjectUrls',
+        'student.portfolioUrls',
+        'student.projectUrls',
+      ],
+    });
   }
 }
