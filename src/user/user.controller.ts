@@ -51,7 +51,7 @@ export class UserController {
 
   @Patch('/:id/password')
   @SetRole('admin')
-  @UseGuards(UserOwnerGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, UserOwnerGuard)
   async changePassword(
     @Param('id') id: string,
     @Body() changePasswordDto: ChangePasswordDto,
