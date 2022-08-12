@@ -27,18 +27,20 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
 import { UserHelperService } from '../user/user-helper.service';
+import { UserService } from '../user/user.service';
 
 @Controller('/auth')
 export class AuthController {
   constructor(
     @Inject(AuthService) private authService: AuthService,
     @Inject(UserHelperService) private userHelperService: UserHelperService,
+    @Inject(UserService) private userService: UserService,
   ) {}
 
   @Get('/user')
   @UseGuards(JwtAuthGuard)
   async getAuthUser(@UserObj() user: User): Promise<GetAuthUserResponse> {
-    return this.userHelperService.filterUserByRole(user);
+    return this.userService.findOne(user.id);
   }
 
   @Post('/login')

@@ -21,7 +21,13 @@ export class UserService {
 
     const user = await User.findOne({
       where: { id },
-      relations: ['student', 'hr'],
+      relations: [
+        'hr',
+        'student',
+        'student.bonusProjectUrls',
+        'student.portfolioUrls',
+        'student.projectUrls',
+      ],
     });
     if (!user) throw new NotFoundException();
 
