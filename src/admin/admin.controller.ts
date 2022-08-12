@@ -1,5 +1,5 @@
 import { Controller, Get, Inject, Query, UseGuards } from '@nestjs/common';
-import { AdminService } from './admin.service';
+import { NotificationService } from './notification.service';
 import { RoleGuard } from '../common/guards/role.guard';
 import { SetRole } from '../common/decorators/set-role';
 import { FindAllNotificationQueryDto } from './dto/find-all-notification-query.dto';
@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @Controller('/admin')
 export class AdminController {
-  constructor(@Inject(AdminService) private notificationService: AdminService) {}
+  constructor(@Inject(NotificationService) private notificationService: NotificationService) {}
 
   @Get('/notification')
   @UseGuards(JwtAuthGuard, RoleGuard)

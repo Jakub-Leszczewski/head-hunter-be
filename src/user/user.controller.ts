@@ -17,6 +17,7 @@ import {
   ChangeStudentEmployedStatusResponse,
   CreateInterviewResponse,
   RemoveInterviewResponse,
+  ChangePasswordResponse,
 } from '../types';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserOwnerGuard } from '../common/guards/user-owner.guard';
@@ -31,6 +32,7 @@ import { InterviewService } from '../hr/interview.service';
 import { ChangeInterviewGuard } from '../common/guards/change-interview.guard';
 import { HrMaxInterviewGuard } from '../common/guards/hr-max-interview.guard';
 import { StudentNotEmployedGuard } from '../common/guards/student-not-employed.guard';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('/user')
 export class UserController {
@@ -45,6 +47,16 @@ export class UserController {
   @SetRole('admin')
   async findOne(@Param('id') id: string): Promise<GetUserResponse> {
     return this.userService.findOne(id);
+  }
+
+  @Patch('/:id/password')
+  @SetRole('admin')
+  @UseGuards(UserOwnerGuard)
+  async changePassword(
+    @Param('id') id: string,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ): Promise<ChangePasswordResponse> {
+    return this.userService.changePassword(id, changePasswordDto);
   }
 
   @Get('/:id/student')
