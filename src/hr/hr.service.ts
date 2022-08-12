@@ -87,7 +87,7 @@ export class HrService {
     return User.findOne({
       where: {
         ...where,
-        role: UserRole.Student,
+        role: UserRole.Hr,
       },
       relations: ['hr'],
     });

@@ -20,7 +20,6 @@ export class HrController {
   }
 
   @Patch('/:userToken')
-  @UseGuards(JwtAuthGuard, UserOwnerGuard)
   async completeSignup(
     @Param('userToken') userToken: string,
     @Body() completionHrDto: CompletionHrDto,
