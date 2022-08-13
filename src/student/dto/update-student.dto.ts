@@ -71,8 +71,8 @@ export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   public courses: string;
 
   @IsInt()
-  @Max(9999)
   @Min(0)
+  @Max(9999)
   @IsNotNull()
   public monthsOfCommercialExp: number;
 
@@ -80,7 +80,7 @@ export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   public workExperience: string;
 
   @IsString()
-  @Length(1, 50)
+  @Length(0, 50)
   public targetWorkCity: string;
 
   @IsNumber()

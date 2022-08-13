@@ -74,6 +74,31 @@ export class StudentService {
     };
   }
 
+  async findAllWithoutAtInterview(
+    hrId: string,
+    query: FindAllQueryDto,
+  ): Promise<GetStudentsResponse> {
+    if (!hrId) throw new BadRequestException();
+    const { search, sortBy, sortMethod, page } = query;
+
+    const [result, totalEntitiesCount] = await this.studentHelperService
+      .findAllStudentsQb(
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.Available]),
+        this.studentHelperService.filterStudentQbCondition(query),
+        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.interviewWithoutHrStudentQbCondition(hrId),
+        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
+        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
+      )
+      .getManyAndCount();
+
+    return {
+      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
+      totalEntitiesCount,
+      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
+    };
+  }
+
   async findOne(id: string): Promise<GetStudentResponse> {
     if (!id) throw new BadRequestException();
 

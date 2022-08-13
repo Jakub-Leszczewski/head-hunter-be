@@ -33,6 +33,7 @@ import { ChangeInterviewGuard } from '../common/guards/change-interview.guard';
 import { HrMaxInterviewGuard } from '../common/guards/hr-max-interview.guard';
 import { StudentNotEmployedGuard } from '../common/guards/student-not-employed.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { HrOwnerGuard } from '../common/guards/hr-owner.guard';
 
 @Controller('/user')
 export class UserController {
@@ -67,9 +68,19 @@ export class UserController {
   }
 
   @Get('/:id/hr/student')
-  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, UserOwnerGuard)
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, HrOwnerGuard)
   @SetRole('admin')
   async findStudentsAtInterview(
+    @Param('id') id: string,
+    @Query() query: FindAllQueryDto,
+  ): Promise<GetStudentsResponse> {
+    return this.studentService.findAllWithoutAtInterview(id, query);
+  }
+
+  @Get('/:id/hr/student/interview')
+  @UseGuards(JwtAuthGuard, OnlyActiveUserGuard, UserOwnerGuard)
+  @SetRole('admin')
+  async findAllStudentsForHr(
     @Param('id') id: string,
     @Query() query: FindAllQueryDto,
   ): Promise<GetStudentsResponse> {

@@ -118,7 +118,7 @@ export class StudentHelperService {
       ])
       .from(User, 'user')
       .leftJoin('user.studentAtInterview', 'studentAtInterview')
-      .leftJoin('studentAtInterview.hr', 'studentInterview')
+      .leftJoin('studentAtInterview.hr', 'studentInterviewHr')
       .leftJoin('user.student', 'student')
       .where('user.role=:role', { role: UserRole.Student })
       .andWhere('user.isActive=:isActive', { isActive: true });
@@ -203,6 +203,17 @@ export class StudentHelperService {
   }
 
   interviewWithHrStudentQbCondition(hrId: string) {
-    return (qb: SelectQueryBuilder<User>) => qb.andWhere('studentInterview.id=:hrId', { hrId });
+    return (qb: SelectQueryBuilder<User>) => qb.andWhere('studentInterviewHr.id=:hrId', { hrId });
+  }
+
+  interviewWithoutHrStudentQbCondition(hrId: string) {
+    return (qb: SelectQueryBuilder<User>) =>
+      qb.andWhere(
+        new Brackets((qb) =>
+          qb
+            .where('studentInterviewHr.id<>:hrId', { hrId })
+            .orWhere('studentAtInterview.id IS NULL'),
+        ),
+      );
   }
 }
