@@ -41,6 +41,8 @@ import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { HrService } from '../hr/hr.service';
 import { NotificationService } from '../admin/notification.service';
 import { InterviewService } from '../hr/interview.service';
+import { Interview } from '../hr/entities/interview.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class StudentService {
@@ -52,6 +54,7 @@ export class StudentService {
     @Inject(NotificationService) private notificationService: NotificationService,
     @Inject(InterviewService) private interviewService: InterviewService,
     @Inject(MailService) private mailService: MailService,
+    @Inject(DataSource) private dataSource: DataSource,
   ) {}
 
   async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {

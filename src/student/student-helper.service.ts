@@ -16,6 +16,7 @@ import fetch from 'node-fetch';
 import { User } from '../user/entities/user.entity';
 import { UserHelperService } from '../user/user-helper.service';
 import { Brackets, DataSource, SelectQueryBuilder } from 'typeorm';
+import { Interview } from '../hr/entities/interview.entity';
 
 @Injectable()
 export class StudentHelperService {
@@ -103,6 +104,8 @@ export class StudentHelperService {
       .select([
         'user',
         'student.status',
+        'studentAtInterview',
+        'studentInterviewHr',
         'student.courseCompletion',
         'student.courseEngagement',
         'student.projectDegree',
@@ -119,6 +122,7 @@ export class StudentHelperService {
       .from(User, 'user')
       .leftJoin('user.studentAtInterview', 'studentAtInterview')
       .leftJoin('studentAtInterview.hr', 'studentInterviewHr')
+      .leftJoin('studentAtInterview.student', 'studentInterviewStudent')
       .leftJoin('user.student', 'student')
       .where('user.role=:role', { role: UserRole.Student })
       .andWhere('user.isActive=:isActive', { isActive: true });
@@ -210,9 +214,18 @@ export class StudentHelperService {
     return (qb: SelectQueryBuilder<User>) =>
       qb.andWhere(
         new Brackets((qb) =>
-          qb
-            .where('studentInterviewHr.id<>:hrId', { hrId })
-            .orWhere('studentAtInterview.id IS NULL'),
+          qb.where((qb) => {
+            const subQuery = qb
+              .subQuery()
+              .select(['user.id'])
+              .from(User, 'user')
+              .leftJoin('user.studentAtInterview', 'interview')
+              .leftJoin('interview.hr', 'hr')
+              .where('hr.id=:hrId', { hrId })
+              .getQuery();
+
+            return 'NOT user.id IN' + subQuery;
+          }),
         ),
       );
   }
