@@ -67,11 +67,13 @@
       </ul>
     </li>
     <li>
-      <a href="#użycie">Użycie</a>
+      <a href="#endpoints">Endpoints</a>
       <ul>
+        <li><a href="#auth">Autoryzacja</a></li>
         <li><a href="#admin">Admin</a></li>
         <li><a href="#hr">Hr</a></li>
-        <li><a href="#kursant">Kursant</a></li>
+        <li><a href="#student">Kursant</a></li>
+        <li><a href="#user">Użytkownik</a></li>
       </ul>
     </li>
   </ol>
@@ -165,33 +167,215 @@ Projekt został stworzony na potrzeby MegaK. Aplikacja ma na celu pomóc kursant
 <!-- USAGE EXAMPLES -->
 ## Endpoints
 
-### Autoryzacja
-* **POST /api/auth/login** - loguje użytkownika i ustawia mu cisstko z tokenem dostępu
-  ```json
-    // dto
+### Auth
+* **POST /api/auth/login** - loguje użytkownika i ustawia mu ciastko z tokenem dostępu
+  ```ts
+    // dto dla body
     {
-      "email": "email@example.com",
-      "password": "Password123"
+      email: string;
+      password: string;
     }
   ```
 * **DELETE /api/auth/logout** - wylogowuję użytkownika, usuwa jwt z ciastek
 * **DELETE /api/auth/password** - wysyła maila na podany adres z linkiem resetującym hasło
-  ```json
-    // dto
+  ```ts
+    // dto dla body
     {
-      "email": "email@example.com"
+      email: string;
     }
   ```
 * **PUT /api/auth/password/:userToken** - zmienia hasło przy pomocy userTokena
-  ```json
-    // dto
+  ```ts
+    // dto dla body
     {
-      "newPassword": "NewPassword123"
+      newPassword: string;
     }
   ```
 * **GET /api/auth/user** - pobiera aktualnie zalogowanego użytkownika
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Admin
+* **GET /api/admin/notification** -  pobiera powiadomienia admina.
+  ```ts
+    // dto dla query
+    {
+      page: number;
+      search: string;
+    }
+  ```
+  <p align="right">(<a href="#top">back to top</a>)</p>
+
+### Hr 
+* **POST /api/hr** - dodaje nowego hr
+  ```ts
+    // dto dla body
+    {
+      email: string;
+      firstName: string;
+      lastName: string;
+      company: string;
+      maxReservedStudents: number;
+    }
+  ```
+ * **PATCH /api/hr/:userToken** - Kończy rejestracje uprzednio dodanego hr
+  ```ts
+    // dto dla body
+    {
+      newPassword: string;
+    }
+  ```
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+### Student
+* **/api/student** - pobiera wszystkich dostępnych kursantów
+  ```ts
+    // dto dla query
+    {
+      page: number;
+      status: StudentStatus[];
+      sortBy: SortBy;
+      sortMethod: SortMethod;
+      search: string;
+      courseCompletion: number;
+      courseEngagement: number;
+      projectDegree: number;
+      teamProjectDegree: number;
+      contractType: ContractType[];
+      typeWork: WorkType[];
+      salaryMin: number;
+      salaryMax: number;
+      canTakeApprenticeship: boolean[];
+      monthsOfCommercialExp: number;
+    }
+  ```
+* **POST /api/student** - importuje wielu kursantów, jeśli kursant z takim mailem istnieje, w bazie danych zostanie pominięty.
+    ```ts
+        // dto dla body
+        {
+          email: string;
+          courseCompletion: number;
+          courseEngagement: number;
+          projectDegree: number;
+          teamProjectDegree: number;
+          bonusProjectUrls: string[];
+        }[]
+      ```
+* **PATCH /api/student/:userToken** - kończy rejestracje użytkownika i uzupełnia go o brakujące dane.
+    ```ts
+        // dto dla body
+        {
+          lastName: string;
+          firstName: string;
+          email: string;
+          password: string;
+          newPassword: string;
+          githubUsername: string;
+          bio: string;
+          phoneNumber: string;
+          projectUrls: string[];
+          portfolioUrls: string[];
+          education: string;
+          courses: string;
+          monthsOfCommercialExp: number;
+          workExperience: string;
+          expectedSalary: number;
+          targetWorkCity: string;
+          expectedContractType: ContractType;
+          expectedTypeWork: WorkType;
+          canTakeApprenticeship: boolean;
+        }
+      ```
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+### User
+* **GET /api/user/:id** - pobiera użytkownika po jego id
+* **PATCH /api/user/:id/password** - zmienia hasło użytkownika
+  ```ts
+    // dto dla body
+    {
+      newPassword: string;
+      password: string;
+    }
+* **GET /api/user/:id/student** - pobiera użytkownika po jego id, który jest kursantem
+* **PATCH /api/user/:id/student** - edytuje użytkownika, który jest kursantem
+    ```ts
+    {
+      lastName: string;
+      firstName: string;
+      email: string;
+      password: string;
+      newPassword: string;
+      githubUsername: string;
+      bio: string;
+      phoneNumber: string;
+      projectUrls: string[];
+      portfolioUrls: string[];
+      education: string;
+      courses: string;
+      monthsOfCommercialExp: number;
+      workExperience: string;
+      expectedSalary: number;
+      targetWorkCity: string;
+      expectedContractType: ContractType;
+      expectedTypeWork: WorkType;
+      canTakeApprenticeship: boolean;
+    }
+    ```
+* **PATCH /api/user/:id/student/employed** - zmienia status użytkownika na zatrudniony
+* **PATCH /api/user/:id/student/interview** - dodaje rozmowę z podanym hr
+  ```ts
+    // dto dla body
+    {
+      hrId: string;
+    }
+* **DELETE /api/user/:id/student/interview** - usuwa rozmowę z podanym hr
+  ```ts
+    // dto dla body
+    {
+      hrId: string;
+    }
+* **GET /api/user/:id/hr/student** - pobiera dostępnych kursantów, którzy nie znajdują się na rozmowie u podanego hr
+  ```ts
+    // dto dla query
+    {
+      page: number;
+      status: StudentStatus[];
+      sortBy: SortBy;
+      sortMethod: SortMethod;
+      search: string;
+      courseCompletion: number;
+      courseEngagement: number;
+      projectDegree: number;
+      teamProjectDegree: number;
+      contractType: ContractType[];
+      typeWork: WorkType[];
+      salaryMin: number;
+      salaryMax: number;
+      canTakeApprenticeship: boolean[];
+      monthsOfCommercialExp: number;
+    }
+  ```
+* **GET /api/user/:id/hr/student/interview** - pobiera kursantów którzy znajdują się na rozmowie u podanego hr
+  ```ts
+    // dto dla query
+    {
+      page: number;
+      status: StudentStatus[];
+      sortBy: SortBy;
+      sortMethod: SortMethod;
+      search: string;
+      courseCompletion: number;
+      courseEngagement: number;
+      projectDegree: number;
+      teamProjectDegree: number;
+      contractType: ContractType[];
+      typeWork: WorkType[];
+      salaryMin: number;
+      salaryMax: number;
+      canTakeApprenticeship: boolean[];
+      monthsOfCommercialExp: number;
+    }
+  ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
