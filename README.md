@@ -142,22 +142,22 @@ Projekt został stworzony na potrzeby MegaK. Aplikacja ma na celu pomóc kursant
    ```
 5. odpowiednio uzupełnij plik config `src/config/config.ts`
     ```ts
-    export const config = {
-      dbHost: 'localhost',  // Adres ip do bazy danych
-      dbPort: 3306,  // Port do bazy danych
-      dbDatabase: '',  // nazwa bazy danych
-      dbUsername: '',  // nazwa użytkownika do bazy danych
-      dbPassword: '',  // hasło do bazy danych
-      dbSynchronize: true,  // czy typeorm ma synchronizować bazę danych zalecane - false
-      dbLogging: false,  // wyświetlanie w konsoli wykonywanego sql
-      feUrl: 'https://head-hunter.pl', // adres url do frontendu
-      mailPassword: 'admin123',  // hasło do servera smtp
-      mailUsername: 'admin',  // nazwa użytkownika do servera smtp
-      jwtSecret:'',  // klucz zabezpieczający jwt
-      jwtTimeToExpire: '1y',  // ważność jwt
-      jwtCookieTimeToExpire: 1000, // ważność ciastak
-      maxItemsOnPage: 30,  // maksymalna ilość elementów na jedną stronę
-   };
+     export const config = {
+       dbHost: 'localhost',  // Adres ip do bazy danych
+       dbPort: 3306,  // Port do bazy danych
+       dbDatabase: '',  // nazwa bazy danych
+       dbUsername: '',  // nazwa użytkownika do bazy danych
+       dbPassword: '',  // hasło do bazy danych
+       dbSynchronize: true,  // czy typeorm ma synchronizować bazę danych zalecane - false
+       dbLogging: false,  // wyświetlanie w konsoli wykonywanego sql
+       feUrl: 'https://head-hunter.pl', // adres url do frontendu
+       mailPassword: 'admin123',  // hasło do servera smtp
+       mailUsername: 'admin',  // nazwa użytkownika do servera smtp
+       jwtSecret:'',  // klucz zabezpieczający jwt
+       jwtTimeToExpire: '1y',  // ważność jwt
+       jwtCookieTimeToExpire: 1000, // ważność ciastak
+       maxItemsOnPage: 30,  // maksymalna ilość elementów na jedną stronę
+     };
     ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
