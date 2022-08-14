@@ -7,4 +7,4 @@ export interface HrInterface {
   user: UserInterface;
 }
 
-export type HrResponseData = Omit<HrInterface, 'user'>;
+export type HrResponseData = Omit<HrInterface, 'user' | 'id'>;

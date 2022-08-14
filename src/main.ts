@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { ValidationPipe } from '@nestjs/common';
-import { GlobalExceptionFilter } from './filters/global-exception-filter';
+import { GlobalExceptionFilter } from './common/filters/global-exception-filter';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -25,6 +25,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
+  app.setGlobalPrefix('api');
 
   await app.listen(3001);
 }

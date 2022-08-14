@@ -1,6 +1,6 @@
 import { HandlebarsAdapter } from '@nest-modules/mailer';
 import { join } from 'path';
-import { config } from '../config/config';
+import { config } from '../../../config/config';
 
 export = {
   transport: `smtp://${config.mailUsername}:${config.mailPassword}@localhost:2500`,
@@ -8,7 +8,7 @@ export = {
     from: 'no-reply@head-hunter.pl',
   },
   template: {
-    dir: join(__dirname, '../../src/mail/templates'),
+    dir: join(__dirname, '../../../../src/common/providers/mail/templates'),
     adapter: new HandlebarsAdapter(),
     options: {
       strict: true,

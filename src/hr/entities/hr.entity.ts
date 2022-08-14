@@ -1,5 +1,5 @@
 import { HrInterface } from '../../types';
-import { BaseEntity, Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
 @Entity()
@@ -17,6 +17,9 @@ export class Hr extends BaseEntity implements HrInterface {
   })
   maxReservedStudents: number;
 
-  @OneToOne((type) => User, (user) => user.hr)
+  @OneToOne((type) => User, (user) => user.hr, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   public user: User;
 }

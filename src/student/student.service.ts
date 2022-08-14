@@ -1,44 +1,116 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  ChangeStudentEmployedStatusResponse,
+  CompleteStudentResponse,
   ContractType,
   CreateStudentsResponse,
+  GetStudentResponse,
+  GetStudentsResponse,
+  StudentStatus,
+  UpdateStudentResponse,
+  UserInterface,
   UserRole,
   WorkType,
-  CompleteStudentsResponse,
-  UpdateStudentsResponse,
 } from '../types';
 import { UserService } from '../user/user.service';
 import { Student } from './entities/student.entity';
 import { BonusProjectUrl } from './entities/bonus-project-url.entity';
 import { User } from '../user/entities/user.entity';
 import { v4 as uuid } from 'uuid';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../common/providers/mail/mail.service';
 import { config } from '../config/config';
-import { hashPwd } from '../utils/hashPwd';
+import { hashPwd } from '../common/utils/hashPwd';
 import { ProjectUrl } from './entities/project-url.entity';
 import { PortfolioUrl } from './entities/portfolio-url.entity';
 import { compare } from 'bcrypt';
-import { isNotEmpty } from '../utils/check-object';
+import { isNotEmpty } from '../common/utils/check-object';
 import { UserHelperService } from '../user/user-helper.service';
 import { StudentHelperService } from './student-helper.service';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { CompletionStudentDto } from './dto/completion-student.dto';
 import { ImportStudentDto } from './dto/import-student.dto';
+import { FindAllQueryDto } from './dto/find-all-query.dto';
+import { HrService } from '../hr/hr.service';
+import { NotificationService } from '../admin/notification.service';
+import { InterviewService } from '../hr/interview.service';
+import { Interview } from '../hr/entities/interview.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class StudentService {
   constructor(
-    private userService: UserService,
-    private userHelperService: UserHelperService,
-    private studentHelperService: StudentHelperService,
-    private mailService: MailService,
+    @Inject(forwardRef(() => UserService)) private userService: UserService,
+    @Inject(forwardRef(() => HrService)) private hrService: HrService,
+    @Inject(forwardRef(() => UserHelperService)) private userHelperService: UserHelperService,
+    @Inject(StudentHelperService) private studentHelperService: StudentHelperService,
+    @Inject(NotificationService) private notificationService: NotificationService,
+    @Inject(InterviewService) private interviewService: InterviewService,
+    @Inject(MailService) private mailService: MailService,
+    @Inject(DataSource) private dataSource: DataSource,
   ) {}
+
+  async findAll(query: FindAllQueryDto): Promise<GetStudentsResponse> {
+    const { search, sortBy, sortMethod, page } = query;
+
+    const [result, totalEntitiesCount] = await this.studentHelperService
+      .findAllStudentsQb(
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.Available]),
+        this.studentHelperService.filterStudentQbCondition(query),
+        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
+        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
+      )
+      .getManyAndCount();
+
+    return {
+      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
+      totalEntitiesCount,
+      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
+    };
+  }
+
+  async findAllWithoutAtInterview(
+    hrId: string,
+    query: FindAllQueryDto,
+  ): Promise<GetStudentsResponse> {
+    if (!hrId) throw new BadRequestException();
+    const { search, sortBy, sortMethod, page } = query;
+
+    const [result, totalEntitiesCount] = await this.studentHelperService
+      .findAllStudentsQb(
+        this.studentHelperService.statusStudentQbCondition([StudentStatus.Available]),
+        this.studentHelperService.filterStudentQbCondition(query),
+        this.studentHelperService.searchStudentQbCondition(search),
+        this.studentHelperService.interviewWithoutHrStudentQbCondition(hrId),
+        this.studentHelperService.orderByStudentQbCondition(sortBy, sortMethod),
+        this.studentHelperService.paginationStudentQbCondition(page, config.maxItemsOnPage),
+      )
+      .getManyAndCount();
+
+    return {
+      result: result.map((e) => this.studentHelperService.filterSmallStudent(e)),
+      totalEntitiesCount,
+      totalPages: Math.ceil(totalEntitiesCount / config.maxItemsOnPage),
+    };
+  }
+
+  async findOne(id: string): Promise<GetStudentResponse> {
+    if (!id) throw new BadRequestException();
+
+    const user = await this.getStudent({ id });
+
+    if (!user) throw new NotFoundException();
+
+    return this.studentHelperService.filterStudent(user);
+  }
 
   async importStudents(createStudentDto: ImportStudentDto[]): Promise<CreateStudentsResponse> {
     const studentResponse: any = [];
@@ -56,8 +128,6 @@ export class StudentService {
         student.courseCompletion = studentDto.courseCompletion;
         student.expectedTypeWork = WorkType.Irrelevant;
         student.expectedContractType = ContractType.Irrelevant;
-        student.canTakeApprenticeship = false;
-        student.monthsOfCommercialExp = 0;
         await student.save();
 
         student.bonusProjectUrls = await this.insertUrls(
@@ -72,13 +142,17 @@ export class StudentService {
         user.role = UserRole.Student;
         user.isActive = false;
         user.userToken = uuid();
+        user.userTokenExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 14);
         await user.save();
 
         user.student = student;
+        student.user = user;
+
         await user.save();
+        await student.save();
 
         await this.mailService.sendStudentSignupEmail(user.email, {
-          signupUrl: `${config.feUrl}/signup/student/${user.id}/${user.userToken}`,
+          signupUrl: `${config.feUrl}/signup/student/${user.userToken}`,
           courseCompletion: student.courseCompletion,
           courseEngagement: student.courseEngagement,
           projectDegree: student.projectDegree,
@@ -95,26 +169,23 @@ export class StudentService {
   async completeSignup(
     userToken: string,
     completionStudentDto: CompletionStudentDto,
-  ): Promise<CompleteStudentsResponse> {
+  ): Promise<CompleteStudentResponse> {
     if (!userToken) throw new BadRequestException();
 
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      newPassword,
-      projectUrls,
-      portfolioUrls,
-      ...studentDto
-    } = completionStudentDto;
+    const { firstName, lastName, email, newPassword, projectUrls, portfolioUrls, ...studentDto } =
+      completionStudentDto;
 
     const user = await this.getStudent({ userToken });
     if (!user || !user.student) throw new NotFoundException();
     if (user.isActive) throw new ForbiddenException();
+    if (user.userTokenExpiredAt < new Date()) throw new ForbiddenException();
 
     if (!(await this.studentHelperService.checkGithubExist(completionStudentDto.githubUsername)))
       throw new NotFoundException('Not found github account');
+
+    await this.studentHelperService.checkStudentFieldUniquenessAndThrow({
+      githubUsername: completionStudentDto.githubUsername,
+    });
 
     if (completionStudentDto.email && completionStudentDto.email === user.email) {
       await this.userHelperService.checkUserFieldUniquenessAndThrow({
@@ -130,6 +201,7 @@ export class StudentService {
     user.hashPwd = await hashPwd(newPassword);
     user.isActive = true;
     user.userToken = null;
+    user.userTokenExpiredAt = null;
 
     await user.student.reload();
     user.student.projectUrls = await this.insertUrls(projectUrls, user.student, ProjectUrl);
@@ -141,7 +213,7 @@ export class StudentService {
     return this.studentHelperService.filterStudent(user);
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<UpdateStudentsResponse> {
+  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<UpdateStudentResponse> {
     if (!id) throw new BadRequestException();
 
     const {
@@ -217,6 +289,27 @@ export class StudentService {
     return this.insertUrls(urls, student, PortfolioUrl);
   }
 
+  async changeEmployedStatus(id: string): Promise<ChangeStudentEmployedStatusResponse> {
+    if (!id) throw new BadRequestException();
+
+    const user = await User.findOne({
+      where: { id },
+      relations: ['student'],
+    });
+    if (!user) throw new NotFoundException();
+
+    user.student.status = StudentStatus.Employed;
+    await user.student.save();
+
+    await this.interviewService.removeAllInterviewsByStudentId(id);
+    await this.notificationService.createNotification(
+      `Kursant ${user.firstName} ${user.lastName} (${user.id}) został zatrudniony`,
+      id,
+    );
+
+    return this.studentHelperService.filterStudent(user);
+  }
+
   async insertUrls(
     urls: string[],
     student: Student,
@@ -236,9 +329,12 @@ export class StudentService {
     );
   }
 
-  async getStudent(where: { [key: string]: any }): Promise<User> {
+  async getStudent(where: Partial<UserInterface>): Promise<User> {
     return User.findOne({
-      where,
+      where: {
+        ...where,
+        role: UserRole.Student,
+      },
       relations: [
         'student',
         'student.bonusProjectUrls',

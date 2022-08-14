@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { config } from '../config/config';
 import { UserModule } from '../user/user.module';
 import { JwtStrategy } from './jwt.strategy';
-import { MailModule } from '../mail/mail.module';
+import { MailModule } from '../common/providers/mail/mail.module';
 
 @Module({
   imports: [

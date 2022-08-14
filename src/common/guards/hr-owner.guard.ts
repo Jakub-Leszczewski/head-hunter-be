@@ -1,0 +1,29 @@
+import {
+  BadRequestException,
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { Reflector } from '@nestjs/core';
+import { User } from '../../user/entities/user.entity';
+import { UserRole } from '../../types';
+
+@Injectable()
+export class HrOwnerGuard implements CanActivate {
+  constructor(@Inject(Reflector) private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const request: Request = context.switchToHttp().getRequest();
+    const handler = context.getHandler();
+    const user = request.user as User;
+    const ownerId = request.params?.id;
+    const roles = this.reflector.get<string[]>('auth_role', handler);
+
+    if (!ownerId) throw new BadRequestException();
+    if (!user) throw new Error('User is undefined');
+
+    return (user.id === ownerId && user.role === UserRole.Hr) || roles?.includes(user.role);
+  }
+}

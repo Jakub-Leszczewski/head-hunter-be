@@ -1,7 +1,18 @@
-import { JoinColumn, BaseEntity, Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  JoinColumn,
+  BaseEntity,
+  Column,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Index,
+  OneToMany,
+} from 'typeorm';
 import { UserInterface, UserRole } from '../../types';
 import { Student } from '../../student/entities/student.entity';
 import { Hr } from '../../hr/entities/hr.entity';
+import { Notification } from '../../admin/entities/notification.entity';
+import { Interview } from '../../hr/entities/interview.entity';
 
 @Entity()
 export class User extends BaseEntity implements UserInterface {
@@ -25,6 +36,7 @@ export class User extends BaseEntity implements UserInterface {
   @Column({
     length: 256,
   })
+  @Index({ unique: true })
   public email: string;
 
   @Column({
@@ -53,7 +65,15 @@ export class User extends BaseEntity implements UserInterface {
     nullable: true,
     default: null,
   })
+  @Index({ unique: true })
   public userToken: string;
+
+  @Column({
+    type: 'datetime',
+    nullable: true,
+    default: null,
+  })
+  public userTokenExpiredAt: Date;
 
   @Column()
   public jwtId: string;
@@ -69,4 +89,13 @@ export class User extends BaseEntity implements UserInterface {
   })
   @JoinColumn()
   public hr: Hr;
+
+  @OneToMany((type) => Notification, (notification) => notification.user)
+  public notifications: Notification[];
+
+  @OneToMany((type) => Interview, (interview) => interview.student)
+  public studentAtInterview: Interview[];
+
+  @OneToMany((type) => Interview, (interview) => interview.hr)
+  public hrInterview: Interview[];
 }

@@ -1,8 +1,9 @@
-import { UserResponseData } from '../user';
+import { UserResponseData, UserRole } from '../user';
 import { HrResponseData } from './hr';
 
-export type HrResponse = Omit<UserResponseData, 'student' | 'hr'> & {
+export type HrResponse = Omit<UserResponseData, 'student' | 'hr' | 'role'> & {
   hr: HrResponseData;
+  role: UserRole.Hr;
 };
 
 export type CreateHrResponse = HrResponse;

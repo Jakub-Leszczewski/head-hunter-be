@@ -4,13 +4,10 @@ import { ContractType, WorkType } from '../../types';
 import {
   ArrayNotEmpty,
   IsBoolean,
-  IsDefined,
   IsEmail,
   IsEnum,
   IsInt,
   IsMobilePhone,
-  IsNotEmpty,
-  IsNotIn,
   IsNumber,
   IsString,
   IsUrl,
@@ -18,9 +15,9 @@ import {
   Matches,
   Max,
   Min,
-  ValidateIf,
 } from 'class-validator';
-import { IsNotNull } from '../../utils/validation';
+import { IsNotNull } from '../../common/decorators/validation';
+import { PASSWORD_REGEX } from '../../common/constants/constant';
 
 export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   @IsString()
@@ -43,7 +40,7 @@ export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
 
   @IsString()
   @Length(8, 36)
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/)
+  @Matches(PASSWORD_REGEX)
   public newPassword: string;
 
   @IsString()
@@ -74,8 +71,8 @@ export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   public courses: string;
 
   @IsInt()
-  @Max(9999)
   @Min(0)
+  @Max(9999)
   @IsNotNull()
   public monthsOfCommercialExp: number;
 
@@ -83,7 +80,7 @@ export class UpdateStudentDto extends PartialType(CompletionStudentDto) {
   public workExperience: string;
 
   @IsString()
-  @Length(1, 50)
+  @Length(0, 50)
   public targetWorkCity: string;
 
   @IsNumber()

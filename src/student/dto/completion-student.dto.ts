@@ -16,6 +16,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { PASSWORD_REGEX } from '../../common/constants/constant';
 
 export class CompletionStudentDto implements UpdateStudentDtoInterface {
   @IsString()
@@ -38,7 +39,7 @@ export class CompletionStudentDto implements UpdateStudentDtoInterface {
 
   @IsString()
   @Length(8, 36)
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/)
+  @Matches(PASSWORD_REGEX)
   public newPassword: string;
 
   @IsString()

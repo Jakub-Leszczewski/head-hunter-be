@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,22 +13,25 @@ import { v4 as uuid } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { UserHelperService } from '../user/user-helper.service';
 import {
-  ResetPasswordResponse,
   LoginResponse,
   LogoutResponse,
+  ResetPasswordResponse,
   SetNewPasswordResponse,
+  StudentStatus,
 } from '../types';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../common/providers/mail/mail.service';
 import { SetNewPasswordDto } from './dto/set-new-password.dto';
-import { hashPwd } from '../utils/hashPwd';
+import { hashPwd } from '../common/utils/hashPwd';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly userHelperService: UserHelperService,
-    private readonly mailService: MailService,
+    @Inject(JwtService) private jwtService: JwtService,
+    @Inject(UserHelperService) private userHelperService: UserHelperService,
+    @Inject(UserService) private userService: UserService,
+    @Inject(MailService) private mailService: MailService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<User | null> {
@@ -37,6 +41,9 @@ export class AuthService {
     });
 
     if (user) {
+      if (user.student?.status === StudentStatus.Employed)
+        throw new ForbiddenException('you have already been employed');
+
       const hashCompareResult = await compare(password, user.hashPwd);
 
       if (hashCompareResult) {
@@ -58,7 +65,7 @@ export class AuthService {
       maxAge: config.jwtCookieTimeToExpire,
     });
 
-    return this.userHelperService.filterOnlyUser(user);
+    return this.userService.findOne(user.id);
   }
 
   async logout(user: User, res: Response): Promise<LogoutResponse> {
@@ -85,6 +92,7 @@ export class AuthService {
     if (!user.isActive) throw new ForbiddenException();
 
     user.userToken = uuid();
+    user.userTokenExpiredAt = new Date(new Date().getTime() + 1000 * 60 * 10);
     await user.save();
 
     await this.mailService.sendForgotPassword(user.email, {
@@ -116,9 +124,11 @@ export class AuthService {
     const user = await User.findOne({ where: { userToken } });
     if (!user) throw new NotFoundException();
     if (!user.isActive) throw new ForbiddenException();
+    if (user.userTokenExpiredAt < new Date()) throw new ForbiddenException();
 
     user.hashPwd = await hashPwd(newPassword);
     user.userToken = null;
+    user.userTokenExpiredAt = null;
     await user.save();
 
     return { ok: true };
