@@ -163,7 +163,33 @@ Projekt został stworzony na potrzeby MegaK. Aplikacja ma na celu pomóc kursant
 
 
 <!-- USAGE EXAMPLES -->
-## Użycie
+## Endpoints
+
+### Autoryzacja
+* **POST /api/auth/login** - loguje użytkownika i ustawia mu cisstko z tokenem dostępu
+  ```json
+    // dto
+    {
+      "email": "email@example.com",
+      "password": "Password123"
+    }
+  ```
+* **DELETE /api/auth/logout** - wylogowuję użytkownika, usuwa jwt z ciastek
+* **DELETE /api/auth/password** - wysyła maila na podany adres z linkiem resetującym hasło
+  ```json
+    // dto
+    {
+      "email": "email@example.com"
+    }
+  ```
+* **PUT /api/auth/password/:userToken** - zmienia hasło przy pomocy userTokena
+  ```json
+    // dto
+    {
+      "newPassword": "NewPassword123"
+    }
+  ```
+* **GET /api/auth/user** - pobiera aktualnie zalogowanego użytkownika
 
 ### Admin
 
