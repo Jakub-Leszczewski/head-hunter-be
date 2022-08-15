@@ -137,9 +137,6 @@ Projekt został stworzony na potrzeby MegaK. Aplikacja ma na celu pomóc kursant
    yarn
    ```
 4. zmień nazwę pliku `src/config/config.example.ts` na `src/config/config.ts`
-   ```ts
-   export const apiUrl = process.env.REACT_APP_API_URL ?? 'http://localhost:3001/api';
-   ```
 5. odpowiednio uzupełnij plik config `src/config/config.ts`
     ```ts
      export const config = {
